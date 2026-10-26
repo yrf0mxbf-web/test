@@ -1,0 +1,15 @@
+{
+  "log_directory": "C:\\\\strovo-log",
+  "downloads_directory": "C:\\\\strovo-log",
+  "create_if_missing": true,
+  "protocol": "strovo",
+  "device_name_format": "Strovo-{PC_NAME_ASCII}",
+  "device_name_example": "Strovo-DESKTOP-ABC123",
+  "set_in_client": "window.strovoDeviceName = os.hostname()  // then site sends Strovo-NAME",
+  "user_agent_hint": "StrovoClient/1.0 (Strovo-DESKTOP-PC)",
+  "protocol_examples": [
+    "strovo://play?id=GAME_UUID",
+    "strovo://play?code=123456"
+  ],
+  "play_url_in_client": "/play.html?id=GAME_UUID&client=1"
+}

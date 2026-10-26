@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strovo — Миллионы игр. Бесконечные возможности.</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">S</div>
+                <span class="logo-text">strovo</span>
+            </a>
+            <nav class="nav">
+                <a href="games.html" class="nav-link">Игры</a>
+                <a href="studio.html" class="nav-link">Studio</a>
+                <a href="shop.html" class="nav-link">Магазин</a>
+                <a href="download.html" class="nav-link">Клиент</a>
+                <a href="profile.html" class="nav-link">Профиль</a>
+            </nav>
+            <div class="header-actions" id="headerActions">
+                <div class="search-box">
+                    <input type="text" placeholder="Поиск" class="search-input">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </div>
+                <a href="login.html" class="btn btn-login" id="btnLogin">Войти</a>
+                <a href="signup.html" class="btn btn-primary" id="btnSignup">Регистрация</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Создавай. Играй.<br>Делись.</h1>
+            <p class="hero-subtitle">Strovo Studio — бесплатный инструмент для создания 3D-игр прямо в браузере. Строй миры из блоков, сохраняй проекты и делись с друзьями.</p>
+            <div class="hero-buttons">
+                <a href="studio.html" class="btn btn-large btn-primary">Открыть Studio</a>
+                <a href="download.html" class="btn btn-large btn-outline">⬇ Скачать клиент</a>
+                <a href="games.html" class="btn btn-large btn-outline">Смотреть игры</a>
+            </div>
+        </div>
+        <div class="hero-avatars">
+            <div class="avatar-block avatar-1"></div>
+            <div class="avatar-block avatar-2"></div>
+            <div class="avatar-block avatar-3"></div>
+            <div class="avatar-block avatar-4"></div>
+        </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <section class="stats-bar">
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-number" id="statPlayers">0</span>
+                <span class="stat-label">игроков онлайн</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="statProjects">0</span>
+                <span class="stat-label">проектов создано</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="statBlocks">0</span>
+                <span class="stat-label">блоков поставлено</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Studio Promo -->
+    <section class="create-section" style="padding: 100px 0;">
+        <div class="section-container">
+            <div class="create-content">
+                <div class="create-text">
+                    <h2 class="create-title">Strovo Studio</h2>
+                    <p class="create-desc">Полноценный 3D-редактор прямо в браузере. Строй миры из блоков, выбирай цвета, сохраняй проекты и возвращайся к ним в любой момент. Никаких установок — просто открой и начни творить!</p>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                        <a href="studio.html" class="btn btn-large btn-primary">Начать строить</a>
+                    </div>
+                    <div style="margin-top:24px;display:flex;gap:24px;flex-wrap:wrap;">
+                        <div><strong style="color:var(--primary);font-size:24px;">3</strong><br><span style="color:var(--text-muted);font-size:13px;">Режима работы</span></div>
+                        <div><strong style="color:var(--primary);font-size:24px;">10+</strong><br><span style="color:var(--text-muted);font-size:13px;">Цветов блоков</span></div>
+                        <div><strong style="color:var(--primary);font-size:24px;">∞</strong><br><span style="color:var(--text-muted);font-size:13px;">Блоков</span></div>
+                    </div>
+                </div>
+                <div class="create-visual">
+                    <div class="studio-preview">
+                        <div class="studio-block"></div>
+                        <div class="studio-block"></div>
+                        <div class="studio-block"></div>
+                        <div class="studio-block"></div>
+                        <div class="studio-block"></div>
+                        <div class="studio-block"></div>
+                        <div class="studio-block"></div>
+                        <div class="studio-block"></div>
+                        <div class="studio-block"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="games-section" style="background:var(--bg-light);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+        <div class="section-container">
+            <h2 class="section-title" style="text-align:center;margin-bottom:48px;">Как это работает</h2>
+            <div class="games-grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr));">
+                <div class="game-card" style="text-align:center;padding:32px;">
+                    <div style="font-size:48px;margin-bottom:16px;">🧱</div>
+                    <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">1. Строй</h3>
+                    <p style="color:var(--text-muted);font-size:14px;">Кликай по сетке, чтобы ставить блоки. Выбирай цвета и создавай уникальные структуры.</p>
+                </div>
+                <div class="game-card" style="text-align:center;padding:32px;">
+                    <div style="font-size:48px;margin-bottom:16px;">💾</div>
+                    <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">2. Сохраняй</h3>
+                    <p style="color:var(--text-muted);font-size:14px;">Сохраняй проекты на сервере. Все твои миры всегда под рукой.</p>
+                </div>
+                <div class="game-card" style="text-align:center;padding:32px;">
+                    <div style="font-size:48px;margin-bottom:16px;">🚀</div>
+                    <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">3. Делись</h3>
+                    <p style="color:var(--text-muted);font-size:14px;">Показывай свои творения друзьям. Скоро — публикация игр для всех!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="logo">
+                    <div class="logo-icon">S</div>
+                    <span class="logo-text">strovo</span>
+                </div>
+                <p class="footer-desc">Strovo — платформа, где миллионы людей собираются вместе, чтобы играть, создавать и делиться удивительными впечатлениями.</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h4>О нас</h4>
+                    <a href="about.html">О Strovo</a>
+                    <a href="blog.html">Блог</a>
+                    <a href="careers.html">Вакансии</a>
+                    <a href="press.html">Пресса</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Родителям</h4>
+                    <a href="safety.html">Безопасность</a>
+                    <a href="parents.html">Родительский контроль</a>
+                    <a href="tips.html">Советы</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Помощь</h4>
+                    <a href="support.html">Поддержка</a>
+                    <a href="status.html">Статус сервера</a>
+                    <a href="community.html">Сообщество</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 Strovo Corporation. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+    const API_URL = window.location.origin;
+    const token = localStorage.getItem('strovo_token');
+
+    // Auth header
+    async function checkAuth() {
+        if (!token) return;
+        try {
+            const res = await fetch(`${API_URL}/api/me`, { headers: {'Authorization':'Bearer '+token} });
+            const data = await res.json();
+            if (data.success) {
+                const actions = document.getElementById('headerActions');
+                actions.innerHTML = `
+                    <div class="search-box">
+                        <input type="text" placeholder="Поиск" class="search-input">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    </div>
+                    <a href="profile.html" class="btn btn-login" style="display:flex;align-items:center;gap:8px;">
+                        <div style="width:24px;height:24px;border-radius:6px;background:${data.user.avatar_color};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:white;">${data.user.username[0].toUpperCase()}</div>
+                        ${data.user.username}
+                    </a>
+                    <button class="btn btn-primary" onclick="logout()">Выйти</button>
+                `;
+            }
+        } catch(e) {}
+    }
+
+    function logout() {
+        localStorage.removeItem('strovo_token');
+        localStorage.removeItem('strovo_user');
+        fetch(`${API_URL}/api/logout`, { method: 'POST', headers: {'Authorization':'Bearer '+token} }).catch(()=>{});
+        window.location.reload();
+    }
+
+    // Animated counters
+    function animateCounter(id, target, suffix='') {
+        const el = document.getElementById(id);
+        if (!el) return;
+        let current = 0;
+        const step = Math.max(1, Math.floor(target / 60));
+        const timer = setInterval(() => {
+            current += step;
+            if (current >= target) { current = target; clearInterval(timer); }
+            el.textContent = current.toLocaleString() + suffix;
+        }, 16);
+    }
+
+    checkAuth();
+    animateCounter('statPlayers', 1247);
+    animateCounter('statProjects', 89);
+    animateCounter('statBlocks', 45231);
+    </script>
+<script src="js/main.js"></script>
+</body>
+</html>

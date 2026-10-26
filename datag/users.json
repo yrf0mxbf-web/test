@@ -1,0 +1,32 @@
+{
+  "Strovo": {
+    "id": "ff432b17-91ac-4812-b002-e03328f18082",
+    "username": "Strovo",
+    "password_hash": "b822bb93905a9bd8b3a0c08168c427696436cf8bf37ed4ab8ebf41a07642ed1c",
+    "birth_date": "2010-03-10",
+    "gender": "male",
+    "created_at": "2026-10-21T21:38:08.458594",
+    "coins": 9999999999,
+    "friends": [],
+    "friend_requests": [],
+    "profile_public": true,
+    "followers": 0,
+    "games_played": 0,
+    "avatar_color": "#ff6b00",
+    "avatar_parts": {
+      "head": "#ffdbac",
+      "torso": "#ff6b00",
+      "left_arm": "#ffdbac",
+      "right_arm": "#ffdbac",
+      "left_leg": "#3742fa",
+      "right_leg": "#3742fa"
+    },
+    "inventory": [],
+    "equipped": {},
+    "is_admin": true,
+    "is_banned": false,
+    "ban_reason": "",
+    "is_muted": false,
+    "mute_reason": ""
+  }
+}

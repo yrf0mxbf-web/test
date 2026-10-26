@@ -1,0 +1,28 @@
+{
+  "fgfgg": {
+    "id": "0abf72a0-3282-47b0-a657-ab0a47090059",
+    "username": "fgfgg",
+    "password_hash": "94ae24016e5367608a79b5b8545364c6c11aa438f5745c9b04486dd03aea35b7",
+    "birth_date": "2008-03-12",
+    "gender": "male",
+    "created_at": "2026-09-04T19:34:14.832031",
+    "robux": 0,
+    "friends": [],
+    "followers": 0,
+    "games_played": 0,
+    "avatar_color": "#ff6b00"
+  },
+  "strovo": {
+    "id": "4ca9e272-6ea3-4afc-88a0-1bf18a013eda",
+    "username": "strovo",
+    "password_hash": "2de005a3b33e1ac9355816d14612e89e47d7b103dd7364394bd5ebdf473b7bca",
+    "birth_date": "2020-09-04",
+    "gender": "male",
+    "created_at": "2026-09-04T22:27:06.315272",
+    "robux": 0,
+    "friends": [],
+    "followers": 0,
+    "games_played": 0,
+    "avatar_color": "#ff6b00"
+  }
+}

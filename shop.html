@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин — Strovo</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <style>
+        .shop-hero { padding: 120px 24px 40px; text-align: center; background: radial-gradient(ellipse at 50% 50%, rgba(255,107,0,0.1) 0%, transparent 60%), var(--bg); }
+        .shop-hero-title { font-size: 48px; font-weight: 900; margin-bottom: 12px; }
+        .shop-hero-subtitle { color: var(--text-muted); font-size: 16px; }
+        .coins-display { display: inline-flex; align-items: center; gap: 8px; background: var(--bg-card); border: 1px solid var(--border); padding: 8px 18px; border-radius: 100px; font-weight: 700; color: var(--primary); }
+        .shop-section { padding: 40px 0 80px; }
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .shop-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; text-align: center; transition: var(--transition); }
+        .shop-card:hover { border-color: var(--primary); transform: translateY(-4px); }
+        .shop-item-icon { width: 80px; height: 80px; margin: 0 auto 12px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 36px; }
+        .shop-item-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+        .shop-item-type { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; }
+        .shop-item-price { font-size: 18px; font-weight: 800; color: var(--primary); margin-bottom: 12px; }
+        .shop-btn { width: 100%; padding: 10px; border-radius: var(--radius-sm); border: none; font-weight: 600; cursor: pointer; transition: var(--transition); }
+        .shop-btn-buy { background: var(--primary); color: white; }
+        .shop-btn-buy:hover { background: var(--primary-hover); }
+        .shop-btn-owned { background: var(--bg-light); color: var(--text-muted); border: 1px solid var(--border); cursor: default; }
+        .shop-btn-nocoins { background: var(--bg-light); color: #ff4757; border: 1px solid var(--border); cursor: not-allowed; }
+        .category-filter { display: flex; gap: 10px; justify-content: center; margin-bottom: 32px; flex-wrap: wrap; }
+        .filter-btn { padding: 8px 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 100px; color: var(--text-muted); font-size: 13px; font-weight: 500; cursor: pointer; transition: var(--transition); }
+        .filter-btn:hover, .filter-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo"><div class="logo-icon">S</div><span class="logo-text">strovo</span></a>
+            <nav class="nav">
+                <a href="games.html" class="nav-link">Игры</a>
+                <a href="studio.html" class="nav-link">Studio</a>
+                <a href="shop.html" class="nav-link" style="color:var(--primary);">Магазин</a>
+                <a href="profile.html" class="nav-link">Профиль</a>
+            </nav>
+             <a href="ai.html" class="nav-link">AI</a>
+            <div class="header-actions" id="headerActions">
+                <div class="search-box">
+                    <input type="text" placeholder="Поиск" class="search-input">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </div>
+                <a href="login.html" class="btn btn-login" id="btnLogin">Войти</a>
+                <a href="signup.html" class="btn btn-primary" id="btnSignup">Регистрация</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="shop-hero">
+        <h1 class="shop-hero-title">Магазин</h1>
+        <p class="shop-hero-subtitle">Предметы для твоего персонажа и донат на коины</p>
+        <div style="margin-top:20px;">
+            <span class="coins-display" id="coinsDisplay">🪙 0 коинов</span>
+        </div>
+    </section>
+
+    <section class="shop-section" style="padding-bottom:20px;">
+        <div class="section-container">
+            <h2 style="font-size:22px;font-weight:800;margin-bottom:16px;">🪙 Купить коины</h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;">
+                <a href="/donat-90-koin" class="shop-card" style="text-decoration:none;color:inherit;border-color:rgba(255,107,0,.35);">
+                    <div class="shop-item-icon" style="background:rgba(255,107,0,.12);">🪙</div>
+                    <div class="shop-item-name">90 коинов</div>
+                    <div class="shop-item-type">Старт</div>
+                    <div style="font-size:22px;font-weight:900;margin:8px 0;">50 ₽</div>
+                    <span class="btn btn-primary" style="display:inline-block;padding:8px 16px;font-size:13px;">Купить</span>
+                </a>
+                <a href="/donat-300-koin" class="shop-card" style="text-decoration:none;color:inherit;border-color:rgba(0,210,106,.35);">
+                    <div class="shop-item-icon" style="background:rgba(0,210,106,.12);">💰</div>
+                    <div class="shop-item-name">300 коинов</div>
+                    <div class="shop-item-type">Выгодно</div>
+                    <div style="font-size:22px;font-weight:900;margin:8px 0;">150 ₽</div>
+                    <span class="btn btn-primary" style="display:inline-block;padding:8px 16px;font-size:13px;">Купить</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="shop-section">
+        <div class="section-container">
+            <h2 style="font-size:22px;font-weight:800;margin-bottom:16px;">🎒 Предметы</h2>
+            <div class="category-filter">
+                <button class="filter-btn active" data-cat="all">Все</button>
+                <button class="filter-btn" data-cat="hat">Шапки</button>
+                <button class="filter-btn" data-cat="shirt">Рубашки</button>
+                <button class="filter-btn" data-cat="pants">Штаны</button>
+                <button class="filter-btn" data-cat="shoes">Обувь</button>
+                <button class="filter-btn" data-cat="face">Лицо</button>
+                <button class="filter-btn" data-cat="back">Спина</button>
+            </div>
+            <div class="shop-grid" id="shopGrid">
+                <div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:40px;">Загрузка...</div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="logo"><div class="logo-icon">S</div><span class="logo-text">strovo</span></div>
+                <p class="footer-desc">Strovo — платформа, где миллионы людей собираются вместе, чтобы играть, создавать и делиться удивительными впечатлениями.</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-column"><h4>О нас</h4><a href="about.html">О Strovo</a><a href="blog.html">Блог</a><a href="careers.html">Вакансии</a><a href="press.html">Пресса</a></div>
+                <div class="footer-column"><h4>Родителям</h4><a href="safety.html">Безопасность</a><a href="parents.html">Родительский контроль</a><a href="tips.html">Советы</a></div>
+                <div class="footer-column"><h4>Помощь</h4><a href="support.html">Поддержка</a><a href="status.html">Статус сервера</a><a href="community.html">Сообщество</a></div>
+            </div>
+        </div>
+        <div class="footer-bottom"><p>© 2026 Strovo Corporation. Все права защищены.</p></div>
+    </footer>
+
+    <script>
+    const API_URL = window.location.origin;
+    const token = localStorage.getItem('strovo_token');
+    let myCoins = 0;
+    let myInventory = [];
+    let shopItems = [];
+
+    async function checkAuth() {
+        if (!token) return;
+        try {
+            const res = await fetch(`${API_URL}/api/me`, { headers: {'Authorization':'Bearer '+token} });
+            const data = await res.json();
+            if (data.success) {
+                myCoins = data.user.coins;
+                myInventory = data.user.inventory || [];
+                document.getElementById('coinsDisplay').textContent = '🪙 ' + myCoins + ' коинов';
+                document.getElementById('headerActions').innerHTML = `
+                    <div class="search-box"><input type="text" placeholder="Поиск" class="search-input"><svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+                    <a href="profile.html" class="btn btn-login" style="display:flex;align-items:center;gap:8px;">
+                        <div style="width:24px;height:24px;border-radius:6px;background:${data.user.avatar_color};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:white;">${data.user.username[0].toUpperCase()}</div>
+                        ${data.user.username}
+                    </a>
+                    <button class="btn btn-primary" onclick="logout()">Выйти</button>`;
+                renderShop();
+            }
+        } catch(e) {}
+    }
+    function logout() { localStorage.removeItem('strovo_token'); localStorage.removeItem('strovo_user'); window.location.reload(); }
+    checkAuth();
+
+    async function loadShop() {
+        try {
+            const res = await fetch(`${API_URL}/api/shop`);
+            const data = await res.json();
+            if (data.success) {
+                shopItems = data.items;
+                renderShop();
+            }
+        } catch(e) {}
+    }
+
+    function renderShop(filter='all') {
+        const grid = document.getElementById('shopGrid');
+        const items = filter === 'all' ? shopItems : shopItems.filter(i => i.type === filter);
+        if (!items.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);">Нет предметов</div>'; return; }
+
+        const typeIcons = { hat:'🎩', shirt:'👕', pants:'👖', shoes:'👟', face:'😎', back:'🎒' };
+        grid.innerHTML = items.map(item => {
+            const owned = myInventory.includes(item.id);
+            const canBuy = myCoins >= item.price && !owned;
+            let btnClass = 'shop-btn-buy';
+            let btnText = '🪙 ' + item.price;
+            let btnOnclick = `buyItem('${item.id}')`;
+            if (owned) { btnClass = 'shop-btn-owned'; btnText = '✓ Куплено'; btnOnclick = ''; }
+            else if (!canBuy && !owned) { btnClass = 'shop-btn-nocoins'; btnText = '🪙 ' + item.price; btnOnclick = ''; }
+
+            return `
+            <div class="shop-card">
+                <div class="shop-item-icon" style="background: ${item.color}20;">${typeIcons[item.type] || '📦'}</div>
+                <div class="shop-item-name">${item.name}</div>
+                <div class="shop-item-type">${item.type}</div>
+                <div class="shop-item-price">🪙 ${item.price}</div>
+                <button class="shop-btn ${btnClass}" onclick="${btnOnclick}" ${!btnOnclick ? 'disabled' : ''}>${btnText}</button>
+            </div>`;
+        }).join('');
+    }
+
+    async function buyItem(itemId) {
+        if (!token) { alert('Войди, чтобы покупать'); return; }
+        try {
+            const res = await fetch(`${API_URL}/api/shop/buy`, {
+                method: 'POST', headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
+                body: JSON.stringify({item_id: itemId})
+            });
+            const data = await res.json();
+            if (data.success) {
+                myCoins = data.coins;
+                myInventory = data.inventory;
+                document.getElementById('coinsDisplay').textContent = '🪙 ' + myCoins + ' коинов';
+                renderShop(document.querySelector('.filter-btn.active')?.dataset.cat || 'all');
+            } else {
+                alert(data.error || 'Ошибка покупки');
+            }
+        } catch(e) { alert('Ошибка'); }
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderShop(btn.dataset.cat);
+        });
+    });
+
+    loadShop();
+    </script>
+<script src="js/main.js"></script>
+</body>
+</html>

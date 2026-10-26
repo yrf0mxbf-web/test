@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Донат 300 коинов — Strovo</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <style>
+        .donate-wrap { min-height: 70vh; display: flex; align-items: center; justify-content: center; padding: 120px 24px 60px; }
+        .donate-card {
+            width: 100%; max-width: 420px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 32px; text-align: center;
+            box-shadow: 0 0 0 1px rgba(0,210,106,.15);
+        }
+        .donate-badge {
+            display: inline-block; background: rgba(0,210,106,.15); color: var(--success);
+            padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 700; margin-bottom: 12px;
+        }
+        .donate-icon { font-size: 56px; margin-bottom: 8px; }
+        .donate-title { font-size: 28px; font-weight: 900; margin-bottom: 4px; }
+        .donate-coins { font-size: 18px; color: var(--primary); font-weight: 700; margin-bottom: 16px; }
+        .donate-price { font-size: 42px; font-weight: 900; margin: 8px 0; }
+        .donate-price span { font-size: 18px; color: var(--text-muted); font-weight: 600; }
+        .donate-desc { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+        .donate-msg { min-height: 20px; font-size: 13px; margin-top: 12px; }
+        .donate-msg.ok { color: var(--success); }
+        .donate-msg.err { color: var(--danger); }
+        .donate-note { font-size: 11px; color: var(--text-muted); margin-top: 16px; line-height: 1.4; }
+        .donate-balance { margin-top: 16px; font-size: 13px; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo"><div class="logo-icon">S</div><span class="logo-text">strovo</span></a>
+            <nav class="nav">
+                <a href="games.html" class="nav-link">Игры</a>
+                <a href="studio.html" class="nav-link">Studio</a>
+                <a href="shop.html" class="nav-link">Магазин</a>
+                <a href="profile.html" class="nav-link">Профиль</a>
+            </nav>
+            <div class="header-actions">
+                <a href="shop.html" class="btn btn-outline">← В магазин</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="donate-wrap">
+        <div class="donate-card">
+            <div class="donate-badge">Выгодно</div>
+            <div class="donate-icon">🪙</div>
+            <h1 class="donate-title">300 коинов</h1>
+            <p class="donate-coins">Пакет /donat-300-koin</p>
+            <div class="donate-price">150 <span>₽</span></div>
+            <p class="donate-desc">Выгодный пакет: больше коинов за те же деньги относительно мини-пакета.</p>
+            <button class="btn btn-primary" style="width:100%;padding:14px;" id="btnBuy" onclick="claimDonate()">Оплатить 150 ₽</button>
+            <div class="donate-msg" id="msg"></div>
+            <div class="donate-balance" id="balance"></div>
+            <p class="donate-note">Нужен вход в аккаунт. На localhost коины зачисляются сразу (демо-оплата).</p>
+        </div>
+    </div>
+
+    <script>
+    const API_URL = window.location.origin;
+    const PACKAGE_ID = 'donat-300-koin';
+    const token = localStorage.getItem('strovo_token');
+
+    async function refreshBalance() {
+        if (!token) {
+            document.getElementById('balance').textContent = 'Вы не вошли в аккаунт';
+            return;
+        }
+        try {
+            const res = await fetch(API_URL + '/api/me', { headers: { 'Authorization': 'Bearer ' + token } });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('balance').textContent = 'Баланс: 🪙 ' + Number(data.user.coins).toLocaleString('ru-RU');
+            }
+        } catch (_) {}
+    }
+
+    async function claimDonate() {
+        const msg = document.getElementById('msg');
+        msg.className = 'donate-msg';
+        msg.textContent = '';
+        if (!token) {
+            msg.className = 'donate-msg err';
+            msg.textContent = 'Сначала войди в аккаунт';
+            setTimeout(() => location.href = 'login.html', 1200);
+            return;
+        }
+        document.getElementById('btnBuy').disabled = true;
+        try {
+            const res = await fetch(API_URL + '/api/donate/' + PACKAGE_ID, {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
+            });
+            const data = await res.json();
+            if (!data.success) {
+                msg.className = 'donate-msg err';
+                msg.textContent = data.error || 'Ошибка';
+                document.getElementById('btnBuy').disabled = false;
+                return;
+            }
+            msg.className = 'donate-msg ok';
+            msg.textContent = data.message || 'Готово!';
+            document.getElementById('balance').textContent = 'Баланс: 🪙 ' + Number(data.coins).toLocaleString('ru-RU');
+            if (localStorage.getItem('strovo_user')) {
+                try {
+                    const u = JSON.parse(localStorage.getItem('strovo_user'));
+                    u.coins = data.coins;
+                    localStorage.setItem('strovo_user', JSON.stringify(u));
+                } catch (_) {}
+            }
+        } catch (e) {
+            msg.className = 'donate-msg err';
+            msg.textContent = 'Ошибка сети';
+            document.getElementById('btnBuy').disabled = false;
+        }
+    }
+
+    refreshBalance();
+    </script>
+</body>
+</html>

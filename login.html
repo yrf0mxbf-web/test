@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход — Strovo</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-logo">
+                <a href="index.html" class="logo">
+                    <div class="logo-icon">S</div>
+                    <span class="logo-text">strovo</span>
+                </a>
+            </div>
+            <h1 class="auth-title">Вход в аккаунт</h1>
+            <p class="auth-subtitle" id="authSubtitle">С возвращением! Войди, чтобы продолжить.</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Имя пользователя</label>
+                    <input type="text" class="form-input" id="username" placeholder="Введи имя пользователя" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Пароль</label>
+                    <input type="password" class="form-input" id="password" placeholder="Введи пароль" required>
+                </div>
+                <div id="errorMsg" class="error-message" style="display:none; color:#ff4757; font-size:13px; margin-bottom:12px;"></div>
+                <button type="submit" class="btn btn-primary btn-full" id="submitBtn">Войти</button>
+            </form>
+            
+            <p class="auth-footer">
+                Нет аккаунта? <a href="signup.html">Зарегистрироваться</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+    const API_URL = window.location.origin;
+
+    (function showPlayHint() {
+        const params = new URLSearchParams(location.search);
+        if (params.get('next')) {
+            document.getElementById('authSubtitle').textContent = 'Чтобы играть в игры Strovo, нужно войти в аккаунт.';
+        }
+    })();
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const err = document.getElementById('errorMsg');
+        btn.disabled = true;
+        btn.textContent = 'Вход...';
+        err.style.display = 'none';
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+
+        try {
+            const res = await fetch(`${API_URL}/api/login`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, password})
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                localStorage.setItem('strovo_token', data.token);
+                localStorage.setItem('strovo_user', JSON.stringify(data.user));
+                const params = new URLSearchParams(location.search);
+                const next = params.get('next');
+                window.location.href = next ? decodeURIComponent(next) : 'index.html';
+            } else {
+                err.textContent = data.error || 'Ошибка входа';
+                err.style.display = 'block';
+            }
+        } catch (e) {
+            err.textContent = 'Сервер недоступен. Запусти: python server.py';
+            err.style.display = 'block';
+        }
+
+        btn.disabled = false;
+        btn.textContent = 'Войти';
+    });
+    </script>
+</body>
+</html>

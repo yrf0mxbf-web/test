@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Скачать клиент — Strovo</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <style>
+        .dl-page { padding: 120px 24px 80px; max-width: 720px; margin: 0 auto; }
+        .dl-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+        }
+        .dl-card h1 { font-size: 28px; font-weight: 900; margin: 0 0 8px; }
+        .dl-card .sub { color: var(--text-muted); margin-bottom: 24px; font-size: 15px; line-height: 1.5; }
+        .dl-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 16px 24px; border-radius: 12px; border: none;
+            background: var(--primary); color: #fff; font-size: 17px; font-weight: 800;
+            text-decoration: none; cursor: pointer; transition: background .15s;
+        }
+        .dl-btn:hover { background: var(--primary-hover); }
+        .dl-btn.secondary {
+            background: var(--bg-hover); border: 1px solid var(--border); color: var(--text);
+            margin-top: 10px;
+        }
+        .dl-meta {
+            margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);
+            font-size: 13px; color: var(--text-muted); line-height: 1.6;
+        }
+        .dl-meta code {
+            background: var(--bg-light); padding: 2px 6px; border-radius: 4px;
+            font-size: 12px; color: var(--secondary);
+        }
+        .dl-steps { margin: 20px 0 0; padding-left: 20px; color: var(--text-muted); font-size: 14px; line-height: 1.7; }
+        .dl-steps li { margin-bottom: 6px; }
+        .dl-missing {
+            margin-top: 16px; padding: 12px 14px; border-radius: 10px;
+            background: rgba(255,193,7,.1); border: 1px solid rgba(255,193,7,.35);
+            color: #ffc107; font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">S</div>
+                <span class="logo-text">strovo</span>
+            </a>
+            <nav class="nav">
+                                <a href="games.html" class="nav-link">Игры</a>
+                <a href="studio.html" class="nav-link">Studio</a>
+                <a href="shop.html" class="nav-link">Магазин</a>
+                <a href="profile.html" class="nav-link">Профиль</a>
+            </nav>
+             <a href="ai.html" class="nav-link">AI</a>
+            <div class="header-actions" id="headerActions">
+                <a href="login.html" class="btn btn-login">Войти</a>
+                <a href="signup.html" class="btn btn-primary">Регистрация хуй</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="dl-page">
+        <div class="dl-card">
+            <h1>Strovo для Windows</h1>
+            <p class="sub">Официальный клиент. После установки логи и загруженные файлы сохраняются в папку <code>C:\strovo-log</code>.</p>
+
+            <a class="dl-btn" id="btnDownload" href="/downloads/Strovo-Setup.exe" download>
+                ⬇ Скачать Strovo.exe
+            </a>
+            
+
+            <div class="dl-missing" id="dlStatus" style="display:none;"></div>
+
+        
+            
+    </main>
+
+    <script>
+    const API_URL = window.location.origin;
+    async function checkFiles() {
+        const status = document.getElementById('dlStatus');
+        try {
+            const res = await fetch(API_URL + '/api/client/download-info');
+            const data = await res.json();
+            if (data.success) {
+                if (data.exe_url) document.getElementById('btnDownload').href = data.exe_url;
+                if (data.zip_url) document.getElementById('btnZip').href = data.zip_url;
+                if (!data.has_exe && !data.has_zip) {
+                    status.style.display = 'block';
+                    status.textContent = 'Файлы клиента пока не загружены на сервер. Положи Strovo-Setup.exe или Strovo-Client.zip в папку downloads/.';
+                }
+            }
+        } catch (e) {}
+    }
+    checkFiles();
+    </script>
+    <script src="js/main.js"></script>
+</body>
+</html>

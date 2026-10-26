@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strovo Studio — Создавай свои миры</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <style>
+        .studio-page { display: flex; flex-direction: column; height: 100vh; }
+        .studio-toolbar {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 16px; background: var(--bg-light);
+            border-bottom: 1px solid var(--border); flex-wrap: wrap;
+        }
+        .studio-toolbar h2 { font-size: 16px; font-weight: 700; margin-right: 12px; }
+        .tool-btn {
+            padding: 8px 14px; background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); color: var(--text); font-size: 13px;
+            cursor: pointer; transition: var(--transition); font-weight: 500;
+        }
+        .tool-btn:hover { border-color: var(--primary); }
+        .tool-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+        .color-palette { display: flex; gap: 5px; align-items: center; }
+        .color-swatch {
+            width: 24px; height: 24px; border-radius: 5px; cursor: pointer;
+            border: 2px solid transparent; transition: var(--transition);
+        }
+        .color-swatch:hover { transform: scale(1.15); }
+        .color-swatch.active { border-color: white; box-shadow: 0 0 0 2px var(--primary); }
+        .studio-main { display: flex; flex: 1; overflow: hidden; }
+        .studio-sidebar {
+            width: 280px; background: var(--bg-light); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; overflow-y: auto;
+        }
+        .sidebar-section { padding: 14px; border-bottom: 1px solid var(--border); }
+        .sidebar-section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 10px; }
+        .project-list { display: flex; flex-direction: column; gap: 6px; }
+        .project-item {
+            padding: 8px 10px; background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); cursor: pointer; font-size: 13px;
+            transition: var(--transition); display: flex; justify-content: space-between; align-items: center;
+        }
+        .project-item:hover { border-color: var(--primary); }
+        .project-item.active { border-color: var(--primary); background: rgba(255,107,0,0.08); }
+        .project-delete { color: #ff4757; font-size: 16px; cursor: pointer; padding: 2px 6px; border-radius: 4px; }
+        .project-delete:hover { background: rgba(255,71,87,0.15); }
+        .studio-canvas-container { flex: 1; position: relative; background: #0a0a0f; }
+        #studioCanvas { width: 100%; height: 100%; display: block; }
+        .canvas-overlay {
+            position: absolute; bottom: 16px; left: 16px;
+            background: rgba(0,0,0,0.7); padding: 8px 14px; border-radius: var(--radius-sm);
+            font-size: 12px; color: var(--text-muted); pointer-events: none;
+        }
+        .canvas-hint {
+            position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.7); padding: 8px 18px; border-radius: 100px;
+            font-size: 12px; color: var(--text-muted); pointer-events: none;
+        }
+        .new-project-input {
+            width: 100%; padding: 8px 10px; background: var(--bg);
+            border: 1px solid var(--border); border-radius: var(--radius-sm);
+            color: var(--text); font-size: 13px; margin-bottom: 8px;
+        }
+        .spacer { flex: 1; }
+        .studio-user { padding: 12px 14px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; font-size: 13px; }
+        .studio-user-avatar { width: 32px; height: 32px; border-radius: 8px; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        .block-counter { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .mode-selector { display: flex; gap: 4px; }
+        .mode-btn { padding: 6px 12px; font-size: 12px; }
+        .material-selector { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+        .material-btn {
+            padding: 6px 10px; font-size: 11px; background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); color: var(--text-muted); cursor: pointer; transition: var(--transition);
+        }
+        .material-btn:hover { border-color: var(--primary); color: var(--text); }
+        .material-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+        .time-selector { display: flex; gap: 6px; margin-top: 8px; }
+        .time-btn {
+            flex: 1; padding: 8px; font-size: 11px; text-align: center; background: var(--bg-card);
+            border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-muted);
+            cursor: pointer; transition: var(--transition);
+        }
+        .time-btn:hover { border-color: var(--primary); }
+        .time-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+        .sky-preview { width: 100%; height: 40px; border-radius: var(--radius-sm); margin-top: 8px; border: 1px solid var(--border); }
+
+        /* ===== MOBILE STUDIO ===== */
+        @media (max-width: 768px) {
+            .studio-main { flex-direction: column; }
+            .studio-sidebar {
+                width: 100%;
+                max-height: 38vh;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                order: 2;
+            }
+            .studio-canvas-container { order: 1; min-height: 45vh; }
+            .studio-toolbar {
+                padding: 6px 10px;
+                gap: 6px;
+            }
+            .studio-toolbar h2 { font-size: 14px; margin-right: 4px; }
+            .tool-btn { padding: 6px 10px; font-size: 12px; }
+            .color-swatch { width: 22px; height: 22px; }
+            .canvas-hint, .canvas-overlay { font-size: 11px; padding: 6px 10px; }
+        }
+        @media (max-width: 480px) {
+            .studio-toolbar h2 { display: none; }
+            .mode-selector { flex-wrap: wrap; }
+        }
+    
+        .publish-modal-overlay {
+            display: none; position: fixed; inset: 0; z-index: 9999;
+            background: rgba(0,0,0,0.65); align-items: center; justify-content: center;
+            padding: 16px;
+        }
+        .publish-modal-overlay.open { display: flex; }
+        .publish-modal {
+            background: var(--bg-card, #1a1a24); border: 1px solid var(--border, #333);
+            border-radius: 16px; padding: 24px; max-width: 520px; width: 100%;
+            max-height: 90vh; overflow-y: auto; color: var(--text, #fff);
+        }
+        .publish-modal h2 { margin: 0 0 8px; font-size: 20px; }
+        .publish-modal .hint { color: var(--text-muted, #888); font-size: 13px; margin-bottom: 16px; }
+        .publish-modal label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 6px; }
+        .publish-modal textarea, .publish-modal input[type="text"] {
+            width: 100%; box-sizing: border-box; padding: 10px 12px;
+            border-radius: 10px; border: 1px solid var(--border, #333);
+            background: var(--bg, #0d0d12); color: inherit; font-family: inherit;
+            font-size: 14px; resize: vertical;
+        }
+        .publish-modal .img-row { display: flex; gap: 12px; flex-wrap: wrap; }
+        .publish-modal .img-box {
+            flex: 1; min-width: 140px; border: 2px dashed var(--border, #444);
+            border-radius: 12px; padding: 12px; text-align: center; cursor: pointer;
+            background: var(--bg, #0d0d12);
+        }
+        .publish-modal .img-box:hover { border-color: var(--primary, #ff6b00); }
+        .publish-modal .img-box img {
+            max-width: 100%; max-height: 120px; border-radius: 8px; display: none; margin: 0 auto 8px;
+        }
+        .publish-modal .img-box.has img { display: block; }
+        .publish-modal .img-box .placeholder { font-size: 28px; margin-bottom: 4px; }
+        .publish-modal .img-box small { color: var(--text-muted, #888); font-size: 11px; }
+        .publish-modal .actions { display: flex; gap: 10px; margin-top: 20px; }
+        .publish-modal .actions button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 14px; }
+        .publish-modal .btn-cancel { background: transparent; border: 1px solid var(--border, #444) !important; color: inherit; }
+        .publish-modal .btn-go { background: var(--primary, #ff6b00); color: #fff; }
+        .publish-modal .err { color: #ff4757; font-size: 13px; margin-top: 10px; min-height: 18px; }
+
+        /* Геймпасы — панель настроек */
+        .gp-modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,.65);
+            z-index: 10000; align-items: center; justify-content: center; padding: 20px;
+        }
+        .gp-modal-overlay.open { display: flex; }
+        .gp-modal {
+            background: var(--bg-card, #1e1e24); border: 1px solid var(--border, #333);
+            border-radius: 16px; padding: 24px; width: 100%; max-width: 520px;
+            max-height: 90vh; overflow-y: auto; color: var(--text, #fff);
+        }
+        .gp-modal h2 { margin: 0 0 6px; font-size: 20px; }
+        .gp-modal .hint { color: var(--text-muted, #888); font-size: 13px; margin-bottom: 16px; }
+        .gp-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+        .gp-item {
+            display: flex; gap: 12px; align-items: flex-start;
+            background: var(--bg-light, #16161a); border: 1px solid var(--border, #333);
+            border-radius: 12px; padding: 12px 14px;
+        }
+        .gp-item .gp-info { flex: 1; min-width: 0; }
+        .gp-item .gp-name { font-weight: 700; font-size: 14px; }
+        .gp-item .gp-desc { font-size: 12px; color: var(--text-muted, #888); margin-top: 2px; }
+        .gp-item .gp-price { font-size: 13px; font-weight: 700; color: var(--primary, #ff6b00); white-space: nowrap; }
+        .gp-item .gp-del {
+            background: transparent; border: 1px solid #ff4757; color: #ff4757;
+            border-radius: 8px; padding: 6px 10px; font-size: 12px; cursor: pointer; font-weight: 600;
+        }
+        .gp-form label { display: block; font-size: 12px; font-weight: 600; margin: 10px 0 4px; }
+        .gp-form input, .gp-form textarea {
+            width: 100%; box-sizing: border-box; background: var(--bg-light, #16161a);
+            border: 1px solid var(--border, #333); color: inherit; border-radius: 8px;
+            padding: 10px 12px; font-size: 14px;
+        }
+        .gp-form .row { display: flex; gap: 10px; }
+        .gp-form .row > * { flex: 1; }
+        .gp-actions { display: flex; gap: 10px; margin-top: 16px; }
+        .gp-actions button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 14px; }
+        .gp-actions .btn-cancel { background: transparent; border: 1px solid var(--border, #444); color: inherit; }
+        .gp-actions .btn-add { background: var(--primary, #ff6b00); color: #fff; }
+        .gp-err { color: #ff4757; font-size: 13px; min-height: 18px; margin-top: 8px; }
+        .gp-empty { color: var(--text-muted, #888); font-size: 13px; text-align: center; padding: 16px 0; }
+
+    </style>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+<body class="studio-page">
+    <!-- Toolbar -->
+    <div class="studio-toolbar">
+        <a href="index.html" class="logo" style="margin-right:8px;">
+            <div class="logo-icon" style="width:28px;height:28px;font-size:0;background:url('images/logo-s.png') center/cover no-repeat;">S</div>
+            <span class="logo-text" style="font-size:18px;">Studio</span>
+        </a>
+        <div class="mode-selector">
+            <button class="tool-btn mode-btn active" data-mode="build">Строить</button>
+            <button class="tool-btn mode-btn" data-mode="delete">Удалять</button>
+            <button class="tool-btn mode-btn" data-mode="paint">Красить</button>
+            <button class="tool-btn mode-btn" data-mode="spatula">🛠️ Спатель</button>
+            <button class="tool-btn mode-btn" data-mode="ruler">📏 Рулетка</button>
+            <button class="tool-btn mode-btn" data-mode="light">💡 Свет</button>
+        </div>
+        <div style="width:1px;height:24px;background:var(--border);margin:0 4px;"></div>
+        <div class="color-palette" id="colorPalette">
+            <div class="color-swatch active" style="background:#ff6b00;" data-color="#ff6b00"></div>
+            <div class="color-swatch" style="background:#00b2ff;" data-color="#00b2ff"></div>
+            <div class="color-swatch" style="background:#00d26a;" data-color="#00d26a"></div>
+            <div class="color-swatch" style="background:#ff4757;" data-color="#ff4757"></div>
+            <div class="color-swatch" style="background:#a55eea;" data-color="#a55eea"></div>
+            <div class="color-swatch" style="background:#fed330;" data-color="#fed330"></div>
+            <div class="color-swatch" style="background:#ffffff;" data-color="#ffffff"></div>
+            <div class="color-swatch" style="background:#2a2a35;" data-color="#2a2a35"></div>
+            <div class="color-swatch" style="background:#8B4513;" data-color="#8B4513"></div>
+            <div class="color-swatch" style="background:#228B22;" data-color="#228B22"></div>
+        </div>
+        <div style="width:1px;height:24px;background:var(--border);margin:0 4px;"></div>
+        <span id="rulerReadout" style="display:none;font-size:12px;color:var(--primary);font-weight:700;">📏 0.0 блока</span>
+        <button class="tool-btn" id="btnClear">Очистить</button>
+        <button class="tool-btn" id="btnSave">💾 Сохранить</button>
+        <button class="tool-btn" id="btnPublish" style="opacity:0.4;cursor:not-allowed;" title="Сначала сохрани проект">🚀 Опубликовать</button>
+        <button class="tool-btn" id="btnUnpublish" style="display:none;background:#ff4757;border-color:#ff4757;color:white;">🚫 Снять с публикации</button>
+        <button class="tool-btn" id="btnGamePasses" style="display:none;" title="Геймпасы игры">🎫 Геймпасы</button>
+        <button class="tool-btn" id="btnPlay" style="background:var(--success);border-color:var(--success);color:white;">▶ Играть</button>
+        <div class="spacer"></div>
+        <span id="saveStatus" style="font-size:12px;color:var(--text-muted);"></span>
+        <span style="font-size:11px;color:var(--text-muted);opacity:0.5;">v0.0.2.V</span>
+    </div>
+
+    <div class="studio-main">
+        <!-- Sidebar -->
+        <div class="studio-sidebar">
+            <div class="sidebar-section">
+                <h3>Мои проекты</h3>
+                <input type="text" class="new-project-input" id="newProjectName" placeholder="Название проекта...">
+                <button class="tool-btn" id="btnNewProject" style="width:100%;">+ Новый проект</button>
+                <div class="project-list" id="projectList" style="margin-top:10px;"></div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>🌍 Мир</h3>
+                <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Время суток</div>
+                <div class="time-selector">
+                    <button class="time-btn active" data-time="day">☀️ День</button>
+                    <button class="time-btn" data-time="sunset">🌅 Закат</button>
+                    <button class="time-btn" data-time="night">🌙 Ночь</button>
+                </div>
+                <div class="sky-preview" id="skyPreview" style="background: linear-gradient(to bottom, #87CEEB, #E0F6FF);"></div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>🧱 Материал блока</h3>
+                <div class="material-selector">
+                    <button class="material-btn active" data-mat="standard">Обычный</button>
+                    <button class="material-btn" data-mat="metal">Металл</button>
+                    <button class="material-btn" data-mat="glow">Светящийся</button>
+                    <button class="material-btn" data-mat="glass">Стекло</button>
+                    <button class="material-btn" data-mat="wood">Дерево</button>
+                    <button class="material-btn" data-mat="stone">Камень</button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>Статистика</h3>
+                <div class="block-counter">Блоков: <strong id="blockCount">0</strong></div>
+                <div class="block-counter">Источников света: <strong id="lightCount">0</strong></div>
+                <div class="block-counter">Режим: <strong id="modeLabel">Строить</strong></div>
+            </div>
+            <div class="spacer"></div>
+            <div class="studio-user" id="studioUser">
+                <div class="studio-user-avatar">?</div>
+                <span>Гость</span>
+            </div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="studio-canvas-container" id="canvasContainer">
+            <div class="canvas-hint" id="canvasHint">ЛКМ — ставить/удалять | ПКМ — вращать камеру | Колесо — зум</div>
+            <div class="canvas-overlay">
+                X: <span id="coordX">0</span> Y: <span id="coordY">0</span> Z: <span id="coordZ">0</span>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const API_URL = window.location.origin;
+    let token = localStorage.getItem('strovo_token');
+    let currentProjectId = null;
+    let currentProjectName = 'Новый проект';
+    let currentProjectPublished = false;
+    let currentPlayUrl = null;
+    let currentMaterial = 'standard';
+    let currentTime = 'day';
+    let lights = [];
+    let rulerPoints = [];
+    let spatulaDragging = false;
+    let spatulaStartCell = null;
+
+    // ==================== AUTH ====================
+    async function loadUser() {
+        const userEl = document.getElementById('studioUser');
+        token = localStorage.getItem('strovo_token');
+        if (!token) {
+            userEl.innerHTML = '<div class="studio-user-avatar">?</div><span>Гость — <a href="login.html" style="color:var(--primary)">войти</a></span>';
+            return;
+        }
+        try {
+            const res = await fetch(`${API_URL}/api/me`, { headers: {'Authorization': 'Bearer ' + token} });
+            const data = await res.json();
+            if (data.success) {
+                userEl.innerHTML = `<div class="studio-user-avatar" style="background:${data.user.avatar_color || 'var(--primary)'};">${data.user.username[0].toUpperCase()}</div><span>${data.user.username}</span>`;
+                loadProjects();
+            } else {
+                // Токен протух
+                localStorage.removeItem('strovo_token');
+                token = null;
+                userEl.innerHTML = '<div class="studio-user-avatar">?</div><span>Гость — <a href="login.html" style="color:var(--primary)">войти</a></span>';
+            }
+        } catch(e) {
+            userEl.innerHTML = '<div class="studio-user-avatar">?</div><span>Нет связи с сервером</span>';
+        }
+    }
+    loadUser();
+
+    // ==================== THREE.JS SETUP ====================
+    const container = document.getElementById('canvasContainer');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x87CEEB);
+    scene.fog = new THREE.Fog(0x87CEEB, 30, 90);
+
+    const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.set(12, 12, 12);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    container.appendChild(renderer.domElement);
+    renderer.domElement.id = 'studioCanvas';
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.1;
+    controls.maxDistance = 80;
+    controls.minDistance = 2;
+    // ЛКМ используется для строительства/удаления/покраски — отдаём вращение камеры на ПКМ,
+    // иначе OrbitControls по умолчанию тоже реагирует на ЛКМ и камера дёргается при каждом клике.
+    controls.mouseButtons = {
+        LEFT: null,
+        MIDDLE: THREE.MOUSE.DOLLY,
+        RIGHT: THREE.MOUSE.ROTATE
+    };
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    dirLight.position.set(15, 25, 10);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width = 2048;
+    dirLight.shadow.mapSize.height = 2048;
+    scene.add(dirLight);
+
+    // Sky dome
+    const skyGeo = new THREE.SphereGeometry(200, 32, 32);
+    const skyMat = new THREE.MeshBasicMaterial({ color: 0x87CEEB, side: THREE.BackSide });
+    const sky = new THREE.Mesh(skyGeo, skyMat);
+    scene.add(sky);
+
+    // Clouds
+    const cloudGroup = new THREE.Group();
+    function createCloud(x, y, z) {
+        const geo = new THREE.SphereGeometry(3, 8, 8);
+        const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 });
+        const cloud = new THREE.Group();
+        for (let i = 0; i < 5; i++) {
+            const puff = new THREE.Mesh(geo, mat);
+            puff.position.set((Math.random()-0.5)*4, (Math.random()-0.5)*1, (Math.random()-0.5)*3);
+            puff.scale.setScalar(0.5 + Math.random()*0.5);
+            cloud.add(puff);
+        }
+        cloud.position.set(x, y, z);
+        return cloud;
+    }
+    for (let i = 0; i < 12; i++) {
+        const c = createCloud((Math.random()-0.5)*120, 30 + Math.random()*20, (Math.random()-0.5)*120);
+        cloudGroup.add(c);
+    }
+    scene.add(cloudGroup);
+
+    // Grid & ground
+    const gridHelper = new THREE.GridHelper(60, 60, 0x555560, 0x333340);
+    scene.add(gridHelper);
+
+    const groundGeo = new THREE.PlaneGeometry(300, 300);
+    const groundMat = new THREE.MeshStandardMaterial({ color: 0x2d5a27, roughness: 0.9 });
+    const ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -0.01;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // Blocks
+    const blocks = [];
+    const blockSize = 1;
+    const baseGeometry = new THREE.BoxGeometry(blockSize, blockSize, blockSize);
+    let currentColor = '#ff6b00';
+    let currentMode = 'build';
+
+    function getMaterial(color, matType) {
+        let c;
+        try {
+            c = new THREE.Color(color || '#ff6b00');
+        } catch (_) {
+            c = new THREE.Color('#ff6b00');
+        }
+        // Без envMap сильный metalness = почти чёрные блоки
+        switch(matType) {
+            case 'metal': return new THREE.MeshStandardMaterial({ color: c, roughness: 0.35, metalness: 0.55 });
+            case 'glow': return new THREE.MeshStandardMaterial({ color: c, roughness: 0.45, metalness: 0, emissive: c, emissiveIntensity: 0.65 });
+            case 'glass': return new THREE.MeshStandardMaterial({ color: c, roughness: 0.15, metalness: 0.05, transparent: true, opacity: 0.5 });
+            case 'wood': return new THREE.MeshStandardMaterial({ color: c, roughness: 0.92, metalness: 0 });
+            case 'stone': return new THREE.MeshStandardMaterial({ color: c, roughness: 0.95, metalness: 0.05 });
+            default: return new THREE.MeshStandardMaterial({ color: c, roughness: 0.45, metalness: 0.05 });
+        }
+    }
+
+    function createBlock(x, y, z, color, matType='standard') {
+        const material = getMaterial(color, matType);
+        const mesh = new THREE.Mesh(baseGeometry, material);
+        mesh.position.set(x, y, z);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        mesh.userData = { isBlock: true, color: color, material: matType };
+        scene.add(mesh);
+        blocks.push(mesh);
+        updateBlockCount();
+        return mesh;
+    }
+
+    function createLight(x, y, z, color) {
+        const light = new THREE.PointLight(color, 2, 20);
+        light.position.set(x, y, z);
+        light.castShadow = true;
+        light.userData = { isLight: true, color: color };
+        scene.add(light);
+
+        // Visual marker
+        const geo = new THREE.SphereGeometry(0.3, 8, 8);
+        const mat = new THREE.MeshBasicMaterial({ color: color });
+        const marker = new THREE.Mesh(geo, mat);
+        marker.position.set(x, y, z);
+        marker.userData = { isLightMarker: true, parentLight: light };
+        scene.add(marker);
+
+        lights.push({ light, marker });
+        updateLightCount();
+        return light;
+    }
+
+    function removeBlock(mesh) {
+        scene.remove(mesh);
+        // ВАЖНО: mesh.geometry — это общая baseGeometry, используемая ВСЕМИ блоками.
+        // Раньше здесь стоял mesh.geometry.dispose(), что уничтожало геометрию
+        // для всех остальных блоков на сцене. Диспоузим только материал — он у каждого блока свой.
+        mesh.material.dispose();
+        const idx = blocks.indexOf(mesh);
+        if (idx > -1) blocks.splice(idx, 1);
+        updateBlockCount();
+    }
+
+    function removeLight(obj) {
+        const idx = lights.findIndex(l => l.light === obj || l.marker === obj);
+        if (idx > -1) {
+            const { light, marker } = lights[idx];
+            scene.remove(light);
+            scene.remove(marker);
+            lights.splice(idx, 1);
+            updateLightCount();
+        }
+    }
+
+    function clearAll() {
+        [...blocks].forEach(b => removeBlock(b));
+        [...lights].forEach(l => { scene.remove(l.light); scene.remove(l.marker); });
+        lights = [];
+        updateLightCount();
+        resetRuler();
+        spatulaDragging = false;
+        spatulaPreview.visible = false;
+    }
+
+    function updateBlockCount() { document.getElementById('blockCount').textContent = blocks.length; }
+    function updateLightCount() { document.getElementById('lightCount').textContent = lights.length; }
+
+    // Time of day
+    const timeSettings = {
+        day: { bg: 0x87CEEB, fog: 0x87CEEB, sky: 0x87CEEB, ambient: 0.5, dir: 1.0, ground: 0x2d5a27 },
+        sunset: { bg: 0xff7e5f, fog: 0xff7e5f, sky: 0xff7e5f, ambient: 0.4, dir: 0.7, ground: 0x5a3a27 },
+        night: { bg: 0x0a0a1a, fog: 0x0a0a1a, sky: 0x0a0a1a, ambient: 0.15, dir: 0.2, ground: 0x1a1a2a }
+    };
+
+    function setTimeOfDay(time) {
+        currentTime = time;
+        const s = timeSettings[time];
+        scene.background.setHex(s.bg);
+        scene.fog.color.setHex(s.fog);
+        sky.material.color.setHex(s.sky);
+        ambientLight.intensity = s.ambient;
+        dirLight.intensity = s.dir;
+        ground.material.color.setHex(s.ground);
+
+        const preview = document.getElementById('skyPreview');
+        if (time === 'day') preview.style.background = 'linear-gradient(to bottom, #87CEEB, #E0F6FF)';
+        else if (time === 'sunset') preview.style.background = 'linear-gradient(to bottom, #ff7e5f, #feb47b)';
+        else preview.style.background = 'linear-gradient(to bottom, #0a0a1a, #1a1a3a)';
+
+        // Cloud visibility
+        cloudGroup.visible = (time !== 'night');
+    }
+
+    // Raycaster
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let highlightMesh = null;
+
+    const highlightGeo = new THREE.BoxGeometry(blockSize + 0.02, blockSize + 0.02, blockSize + 0.02);
+    const highlightMat = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.5 });
+    highlightMesh = new THREE.Mesh(highlightGeo, highlightMat);
+    highlightMesh.visible = false;
+    scene.add(highlightMesh);
+
+    const ghostGeo = new THREE.BoxGeometry(blockSize, blockSize, blockSize);
+    const ghostMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(currentColor), transparent: true, opacity: 0.35 });
+    const ghostMesh = new THREE.Mesh(ghostGeo, ghostMat);
+    ghostMesh.visible = false;
+    scene.add(ghostMesh);
+
+    // ==================== RULER (РУЛЕТКА) — измерение + растягивание блоков ====================
+    const rulerMarkerGeo = new THREE.SphereGeometry(0.1, 12, 12);
+    const rulerMarkerMat = new THREE.MeshBasicMaterial({ color: 0x00d26a });
+    const rulerMarkerA = new THREE.Mesh(rulerMarkerGeo, rulerMarkerMat);
+    const rulerMarkerB = new THREE.Mesh(rulerMarkerGeo, rulerMarkerMat);
+    rulerMarkerA.visible = false;
+    rulerMarkerB.visible = false;
+    scene.add(rulerMarkerA, rulerMarkerB);
+
+    const rulerLineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+    const rulerLineMat = new THREE.LineDashedMaterial({ color: 0x00d26a, dashSize: 0.3, gapSize: 0.15, linewidth: 2 });
+    const rulerLine = new THREE.Line(rulerLineGeo, rulerLineMat);
+    rulerLine.visible = false;
+    scene.add(rulerLine);
+
+    // Превью растягивания (полупрозрачные блоки вдоль линии)
+    const rulerPreviewGroup = new THREE.Group();
+    scene.add(rulerPreviewGroup);
+    let rulerPaintColor = null;
+    let rulerPaintMaterial = null;
+
+    function rulerSnapPoint(intersect) {
+        const obj = intersect.object;
+        if (obj === ground) {
+            return new THREE.Vector3(snapToGrid(intersect.point.x), blockSize / 2, snapToGrid(intersect.point.z));
+        }
+        // Клик по блоку — берём центр блока (растягиваем от него)
+        if (obj.userData && obj.userData.isBlock) {
+            return obj.position.clone();
+        }
+        const normal = intersect.face ? intersect.face.normal.clone() : new THREE.Vector3(0, 1, 0);
+        return obj.position.clone().add(normal.multiplyScalar(blockSize / 2));
+    }
+
+    function snapVecToGrid(v) {
+        return new THREE.Vector3(
+            snapToGrid(v.x),
+            // Y: центры блоков на 0.5, 1.5, 2.5...
+            Math.round((v.y - blockSize / 2) / blockSize) * blockSize + blockSize / 2,
+            snapToGrid(v.z)
+        );
+    }
+
+    // Воксельная линия между двумя точками (3D Bresenham)
+    function voxelsAlongLine(a, b) {
+        const start = snapVecToGrid(a);
+        const end = snapVecToGrid(b);
+        const x0 = Math.round(start.x / blockSize);
+        const y0 = Math.round((start.y - blockSize / 2) / blockSize);
+        const z0 = Math.round(start.z / blockSize);
+        const x1 = Math.round(end.x / blockSize);
+        const y1 = Math.round((end.y - blockSize / 2) / blockSize);
+        const z1 = Math.round(end.z / blockSize);
+
+        const dx = Math.abs(x1 - x0), dy = Math.abs(y1 - y0), dz = Math.abs(z1 - z0);
+        const sx = x0 < x1 ? 1 : -1;
+        const sy = y0 < y1 ? 1 : -1;
+        const sz = z0 < z1 ? 1 : -1;
+        const dm = Math.max(dx, dy, dz);
+        const points = [];
+        let x = x0, y = y0, z = z0;
+        let ex = dm / 2, ey = dm / 2, ez = dm / 2;
+        for (let i = 0; i <= dm; i++) {
+            points.push(new THREE.Vector3(
+                x * blockSize,
+                y * blockSize + blockSize / 2,
+                z * blockSize
+            ));
+            ex -= dx; if (ex < 0) { ex += dm; x += sx; }
+            ey -= dy; if (ey < 0) { ey += dm; y += sy; }
+            ez -= dz; if (ez < 0) { ez += dm; z += sz; }
+        }
+        return points;
+    }
+
+    function clearRulerPreview() {
+        while (rulerPreviewGroup.children.length) {
+            const c = rulerPreviewGroup.children.pop();
+            if (c.geometry) c.geometry.dispose();
+            if (c.material) c.material.dispose();
+            rulerPreviewGroup.remove(c);
+        }
+    }
+
+    function updateRulerPreview(a, b) {
+        clearRulerPreview();
+        const pts = voxelsAlongLine(a, b);
+        const MAX = 200;
+        const show = pts.slice(0, MAX);
+        const mat = new THREE.MeshBasicMaterial({
+            color: new THREE.Color(rulerPaintColor || currentColor),
+            transparent: true,
+            opacity: 0.4
+        });
+        const geo = new THREE.BoxGeometry(blockSize * 0.95, blockSize * 0.95, blockSize * 0.95);
+        show.forEach(p => {
+            const m = new THREE.Mesh(geo, mat);
+            m.position.copy(p);
+            rulerPreviewGroup.add(m);
+        });
+    }
+
+    function updateRulerReadout(a, b) {
+        const readout = document.getElementById('rulerReadout');
+        readout.style.display = 'inline';
+        const dist = a.distanceTo(b);
+        const blocks = voxelsAlongLine(a, b).length;
+        readout.textContent = `📏 ${dist.toFixed(1)} · ${blocks} блок(ов) · ЛКМ — растянуть`;
+    }
+
+    function updateRulerLine(a, b) {
+        rulerLine.geometry.dispose();
+        rulerLine.geometry = new THREE.BufferGeometry().setFromPoints([a, b]);
+        rulerLine.computeLineDistances();
+        rulerLine.visible = true;
+        updateRulerReadout(a, b);
+        updateRulerPreview(a, b);
+    }
+
+    function stretchRulerBlocks(a, b) {
+        const pts = voxelsAlongLine(a, b);
+        if (pts.length > 500) {
+            document.getElementById('saveStatus').textContent = 'Слишком длинная линия (макс. 500)';
+            setTimeout(() => document.getElementById('saveStatus').textContent = '', 2500);
+            return;
+        }
+        const color = rulerPaintColor || currentColor;
+        const matType = rulerPaintMaterial || currentMaterial;
+        let added = 0;
+        pts.forEach(p => {
+            const exists = blocks.some(b => b.position.distanceTo(p) < 0.15);
+            if (!exists) {
+                createBlock(p.x, p.y, p.z, color, matType);
+                added++;
+            }
+        });
+        document.getElementById('saveStatus').textContent = added
+            ? `Растянуто: +${added} блоков`
+            : 'Блоки уже на месте';
+        setTimeout(() => document.getElementById('saveStatus').textContent = '', 2000);
+    }
+
+    function resetRuler() {
+        rulerPoints = [];
+        rulerMarkerA.visible = false;
+        rulerMarkerB.visible = false;
+        rulerLine.visible = false;
+        rulerPaintColor = null;
+        rulerPaintMaterial = null;
+        clearRulerPreview();
+        document.getElementById('rulerReadout').style.display = 'none';
+    }
+
+    // ==================== SPATULA (СПАТЕЛЬ) — ЗАЛИВКА ОБЛАСТИ ====================
+    const spatulaPreviewMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.28 });
+    const spatulaPreview = new THREE.Mesh(new THREE.BoxGeometry(1, 0.06, 1), spatulaPreviewMat);
+    spatulaPreview.visible = false;
+    scene.add(spatulaPreview);
+
+    function cellKey(x, z) { return x + '_' + z; }
+
+    function updateSpatulaPreview(startCell, endCell) {
+        const minX = Math.min(startCell.x, endCell.x), maxX = Math.max(startCell.x, endCell.x);
+        const minZ = Math.min(startCell.z, endCell.z), maxZ = Math.max(startCell.z, endCell.z);
+        spatulaPreview.scale.set((maxX - minX) + blockSize, 1, (maxZ - minZ) + blockSize);
+        spatulaPreview.position.set((minX + maxX) / 2, 0.06, (minZ + maxZ) / 2);
+        spatulaPreview.material.color.set(currentColor);
+        spatulaPreview.visible = true;
+    }
+
+    function fillSpatulaArea(startCell, endCell) {
+        const minX = Math.min(startCell.x, endCell.x), maxX = Math.max(startCell.x, endCell.x);
+        const minZ = Math.min(startCell.z, endCell.z), maxZ = Math.max(startCell.z, endCell.z);
+        const cellsX = Math.round((maxX - minX) / blockSize) + 1;
+        const cellsZ = Math.round((maxZ - minZ) / blockSize) + 1;
+        const MAX_CELLS = 900;
+        if (cellsX * cellsZ > MAX_CELLS) {
+            document.getElementById('saveStatus').textContent = 'Слишком большая область (макс. 900 блоков за раз)';
+            setTimeout(() => document.getElementById('saveStatus').textContent = '', 2500);
+            return;
+        }
+        const occupied = new Set(blocks.map(b => cellKey(snapToGrid(b.position.x), snapToGrid(b.position.z))));
+        for (let x = minX; x <= maxX + 0.01; x += blockSize) {
+            for (let z = minZ; z <= maxZ + 0.01; z += blockSize) {
+                const gx = snapToGrid(x), gz = snapToGrid(z);
+                const key = cellKey(gx, gz);
+                if (!occupied.has(key)) {
+                    createBlock(gx, blockSize / 2, gz, currentColor, currentMaterial);
+                    occupied.add(key);
+                }
+            }
+        }
+    }
+
+    function getIntersect(event) {
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        const allObjects = [ground, ...blocks, ...lights.map(l => l.marker)];
+        const intersects = raycaster.intersectObjects(allObjects);
+        return intersects.length > 0 ? intersects[0] : null;
+    }
+
+    function snapToGrid(val) { return Math.round(val / blockSize) * blockSize; }
+
+    renderer.domElement.addEventListener('mousemove', (e) => {
+        const intersect = getIntersect(e);
+
+        if (spatulaDragging && intersect) {
+            const cell = { x: snapToGrid(intersect.point.x), z: snapToGrid(intersect.point.z) };
+            updateSpatulaPreview(spatulaStartCell, cell);
+        }
+
+        if (!intersect) { highlightMesh.visible = false; ghostMesh.visible = false; return; }
+
+        const obj = intersect.object;
+
+        if (currentMode === 'build' || currentMode === 'light') {
+            let pos;
+            if (obj === ground) {
+                pos = new THREE.Vector3(snapToGrid(intersect.point.x), currentMode === 'light' ? 2 : blockSize/2, snapToGrid(intersect.point.z));
+            } else if (obj.userData.isLightMarker) {
+                pos = obj.position.clone();
+                pos.y += 1;
+            } else {
+                const normal = intersect.face.normal.clone();
+                pos = obj.position.clone().add(normal);
+            }
+            ghostMesh.position.copy(pos);
+            ghostMesh.visible = (currentMode === 'build');
+            highlightMesh.position.copy(pos);
+            highlightMesh.visible = true;
+            document.getElementById('coordX').textContent = Math.round(pos.x);
+            document.getElementById('coordY').textContent = Math.round(pos.y);
+            document.getElementById('coordZ').textContent = Math.round(pos.z);
+        } else if (currentMode === 'delete' || currentMode === 'paint') {
+            if (obj !== ground) {
+                highlightMesh.position.copy(obj.position);
+                highlightMesh.visible = true;
+                ghostMesh.visible = false;
+            } else {
+                highlightMesh.visible = false; ghostMesh.visible = false;
+            }
+        } else if (currentMode === 'ruler') {
+            const pos = rulerSnapPoint(intersect);
+            highlightMesh.position.copy(pos);
+            highlightMesh.visible = true;
+            ghostMesh.visible = false;
+            if (rulerPoints.length === 1) updateRulerLine(rulerPoints[0], pos);
+        } else if (currentMode === 'spatula') {
+            highlightMesh.visible = false;
+            ghostMesh.visible = false;
+        }
+    });
+
+    renderer.domElement.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        const intersect = getIntersect(e);
+        if (!intersect) return;
+        const obj = intersect.object;
+
+        if (currentMode === 'build') {
+            let pos;
+            if (obj === ground) {
+                pos = new THREE.Vector3(snapToGrid(intersect.point.x), blockSize/2, snapToGrid(intersect.point.z));
+            } else {
+                const normal = intersect.face.normal.clone();
+                pos = obj.position.clone().add(normal);
+            }
+            const exists = blocks.some(b => b.position.distanceTo(pos) < 0.1);
+            if (!exists) createBlock(pos.x, pos.y, pos.z, currentColor, currentMaterial);
+        } else if (currentMode === 'light') {
+            let pos;
+            if (obj === ground) pos = new THREE.Vector3(snapToGrid(intersect.point.x), 2, snapToGrid(intersect.point.z));
+            else pos = obj.position.clone().add(new THREE.Vector3(0, 1, 0));
+            createLight(pos.x, pos.y, pos.z, currentColor);
+        } else if (currentMode === 'delete') {
+            if (obj !== ground) {
+                if (obj.userData.isBlock) removeBlock(obj);
+                else if (obj.userData.isLightMarker) removeLight(obj);
+            }
+        } else if (currentMode === 'paint') {
+            if (obj !== ground && obj.userData.isBlock) {
+                const oldMaterial = obj.material;
+                obj.material = getMaterial(currentColor, obj.userData.material || 'standard');
+                oldMaterial.dispose();
+                obj.userData.color = currentColor;
+            }
+        } else if (currentMode === 'ruler') {
+            const pos = rulerSnapPoint(intersect);
+            // Если клик по блоку на старте — копируем его цвет/материал для растягивания
+            if (rulerPoints.length === 0 && obj !== ground && obj.userData && obj.userData.isBlock) {
+                rulerPaintColor = obj.userData.color || currentColor;
+                rulerPaintMaterial = obj.userData.material || currentMaterial;
+            } else if (rulerPoints.length === 0) {
+                rulerPaintColor = currentColor;
+                rulerPaintMaterial = currentMaterial;
+            }
+
+            if (rulerPoints.length >= 2) {
+                // Третий клик — начать заново
+                resetRuler();
+            }
+            rulerPoints.push(pos.clone());
+            if (rulerPoints.length === 1) {
+                rulerMarkerA.position.copy(pos);
+                rulerMarkerA.visible = true;
+                rulerMarkerB.visible = false;
+                rulerLine.visible = false;
+                clearRulerPreview();
+            } else {
+                rulerMarkerB.position.copy(pos);
+                rulerMarkerB.visible = true;
+                updateRulerLine(rulerPoints[0], rulerPoints[1]);
+                // Растянуть блоки по линии
+                stretchRulerBlocks(rulerPoints[0], rulerPoints[1]);
+                clearRulerPreview();
+            }
+        } else if (currentMode === 'spatula') {
+            const cell = { x: snapToGrid(intersect.point.x), z: snapToGrid(intersect.point.z) };
+            spatulaDragging = true;
+            spatulaStartCell = cell;
+            updateSpatulaPreview(cell, cell);
+        }
+    });
+
+    window.addEventListener('mouseup', (e) => {
+        if (e.button !== 0 || !spatulaDragging) return;
+        spatulaDragging = false;
+        const intersect = getIntersect(e);
+        const endCell = intersect ? { x: snapToGrid(intersect.point.x), z: snapToGrid(intersect.point.z) } : spatulaStartCell;
+        fillSpatulaArea(spatulaStartCell, endCell);
+        spatulaPreview.visible = false;
+    });
+
+    // ==================== UI CONTROLS ====================
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentMode = btn.dataset.mode;
+            const labels = { build: 'Строить', delete: 'Удалять', paint: 'Красить', spatula: 'Спатель', ruler: 'Рулетка', light: 'Свет' };
+            document.getElementById('modeLabel').textContent = labels[currentMode];
+
+            resetRuler();
+            spatulaDragging = false;
+            spatulaPreview.visible = false;
+
+            const hints = {
+                build: 'ЛКМ — ставить/удалять | ПКМ — вращать камеру | Колесо — зум',
+                delete: 'ЛКМ — удалить блок или свет | ПКМ — вращать камеру',
+                paint: 'ЛКМ — перекрасить блок | ПКМ — вращать камеру',
+                spatula: 'ЛКМ и потяни — залить область блоками одним махом | ПКМ — вращать камеру',
+                ruler: 'Рулетка: 1-й клик — начало, 2-й — конец: измерить и растянуть блоки | ПКМ — камера',
+                light: 'ЛКМ — поставить источник света | ПКМ — вращать камеру'
+            };
+            document.getElementById('canvasHint').textContent = hints[currentMode];
+        });
+    });
+
+    document.querySelectorAll('.color-swatch').forEach(sw => {
+        sw.addEventListener('click', () => {
+            document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+            sw.classList.add('active');
+            currentColor = sw.dataset.color;
+            ghostMat.color.set(currentColor);
+        });
+    });
+
+    document.querySelectorAll('.material-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.material-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentMaterial = btn.dataset.mat;
+        });
+    });
+
+    document.querySelectorAll('.time-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            setTimeOfDay(btn.dataset.time);
+        });
+    });
+
+    document.getElementById('btnClear').addEventListener('click', () => { if (confirm('Очистить всё?')) clearAll(); });
+
+    // ==================== PROJECTS API ====================
+    function updatePublishButtons() {
+        const btnPub = document.getElementById('btnPublish');
+        const btnUnpub = document.getElementById('btnUnpublish');
+        const btnGp = document.getElementById('btnGamePasses');
+        if (!currentProjectId) {
+            // Нет проекта — показываем затемнённую кнопку
+            btnPub.style.display = 'inline-flex';
+            btnPub.style.opacity = '0.4';
+            btnPub.style.cursor = 'not-allowed';
+            btnPub.title = 'Сначала сохрани проект';
+            btnUnpub.style.display = 'none';
+            if (btnGp) btnGp.style.display = 'none';
+        } else if (currentProjectPublished) {
+            // Опубликовано — показываем "Снять" и геймпасы
+            btnPub.style.display = 'none';
+            btnUnpub.style.display = 'inline-flex';
+            if (btnGp) btnGp.style.display = 'inline-flex';
+        } else {
+            // Сохранено но не опубликовано — активная кнопка
+            btnPub.style.display = 'inline-flex';
+            btnPub.style.opacity = '1';
+            btnPub.style.cursor = 'pointer';
+            btnPub.title = 'Опубликовать игру в каталоге';
+            btnUnpub.style.display = 'none';
+            // Геймпасы можно настраивать и до публикации
+            if (btnGp) btnGp.style.display = 'inline-flex';
+        }
+    }
+
+    async function loadProjects() {
+        if (!token) return;
+        try {
+            const res = await fetch(`${API_URL}/api/projects`, { headers: {'Authorization': 'Bearer ' + token} });
+            const data = await res.json();
+            const list = document.getElementById('projectList');
+            list.innerHTML = '';
+            if (data.success && data.projects.length) {
+                data.projects.forEach(p => {
+                    const el = document.createElement('div');
+                    el.className = 'project-item' + (p.id === currentProjectId ? ' active' : '');
+                    const pubBadge = p.published ? '<span style="color:var(--success);font-size:10px;margin-left:4px;">●</span>' : '';
+                    el.innerHTML = `<span>${p.name}${pubBadge}</span><span class="project-delete" data-id="${p.id}">×</span>`;
+                    el.querySelector('span:first-child').addEventListener('click', () => loadProject(p.id, p.name, p.blocks, p.published, p.world_settings, p.url));
+                    el.querySelector('.project-delete').addEventListener('click', (e) => { e.stopPropagation(); deleteProject(p.id); });
+                    list.appendChild(el);
+                });
+            } else {
+                list.innerHTML = '<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:8px;">Нет проектов</div>';
+            }
+        } catch(e) {}
+    }
+
+    async function saveProject() {
+        // Обновляем токен на случай, если вошли в другой вкладке
+        token = localStorage.getItem('strovo_token');
+        if (!token) {
+            alert('Войди в аккаунт, чтобы сохранять проекты.\nОткрой login.html и войди, затем вернись в Studio.');
+            document.getElementById('saveStatus').textContent = 'Нужен вход';
+            setTimeout(() => document.getElementById('saveStatus').textContent = '', 3000);
+            return false;
+        }
+
+        // Если проект ещё без имени — спросим
+        if (!currentProjectName || currentProjectName === 'Новый проект') {
+            const inputName = (document.getElementById('newProjectName').value || '').trim();
+            if (inputName) {
+                currentProjectName = inputName;
+                document.getElementById('newProjectName').value = '';
+            } else {
+                const asked = prompt('Название проекта:', currentProjectName || 'Мой мир');
+                if (!asked || !asked.trim()) {
+                    document.getElementById('saveStatus').textContent = 'Нужно название';
+                    setTimeout(() => document.getElementById('saveStatus').textContent = '', 2500);
+                    return false;
+                }
+                currentProjectName = asked.trim();
+            }
+        }
+
+        const blocksData = blocks.map(b => ({
+            x: b.position.x, y: b.position.y, z: b.position.z,
+            color: b.userData.color, material: b.userData.material || 'standard'
+        }));
+        const lightsData = lights.map(l => ({
+            x: l.light.position.x, y: l.light.position.y, z: l.light.position.z,
+            color: l.light.color.getHexString()
+        }));
+        const payload = {
+            name: currentProjectName,
+            blocks: blocksData,
+            world_settings: { time: currentTime, lights: lightsData }
+        };
+
+        try {
+            document.getElementById('saveStatus').textContent = 'Сохранение...';
+            let res;
+            if (currentProjectId) {
+                res = await fetch(`${API_URL}/api/projects/${currentProjectId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(payload)
+                });
+            } else {
+                res = await fetch(`${API_URL}/api/projects`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(payload)
+                });
+            }
+
+            let data = {};
+            try { data = await res.json(); } catch (_) {}
+
+            if (!res.ok || !data.success) {
+                const err = (data && data.error) || ('HTTP ' + res.status);
+                document.getElementById('saveStatus').textContent = 'Ошибка: ' + err;
+                if (res.status === 401) {
+                    alert('Сессия истекла или ты не вошёл. Войди заново (login.html).');
+                    token = null;
+                }
+                setTimeout(() => document.getElementById('saveStatus').textContent = '', 4000);
+                return false;
+            }
+
+            if (!currentProjectId && data.project && data.project.id) {
+                currentProjectId = data.project.id;
+            }
+            if (data.project && data.project.name) {
+                currentProjectName = data.project.name;
+            }
+
+            document.getElementById('saveStatus').textContent = 'Сохранено! ✓';
+            updatePublishButtons();
+            loadProjects();
+            setTimeout(() => document.getElementById('saveStatus').textContent = '', 2500);
+            return true;
+        } catch (e) {
+            document.getElementById('saveStatus').textContent = 'Ошибка сети при сохранении';
+            console.error('saveProject', e);
+            setTimeout(() => document.getElementById('saveStatus').textContent = '', 4000);
+            return false;
+        }
+    }
+
+    async function deleteProject(id) {
+        if (!confirm('Удалить проект?')) return;
+        try {
+            await fetch(`${API_URL}/api/projects/${id}`, { method: 'DELETE', headers: {'Authorization':'Bearer '+token} });
+            if (currentProjectId === id) { currentProjectId = null; currentProjectName = 'Новый проект'; currentProjectPublished = false; }
+            loadProjects();
+        } catch(e) {}
+    }
+
+    let pubCoverData = null;
+    let pubPhotoData = null;
+
+    function resizeImageFile(file, maxW, maxH, quality) {
+        return new Promise((resolve, reject) => {
+            if (!file || !file.type.startsWith('image/')) {
+                reject(new Error('Нужна картинка'));
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => {
+                const img = new Image();
+                img.onload = () => {
+                    let w = img.width, h = img.height;
+                    const scale = Math.min(1, maxW / w, maxH / h);
+                    w = Math.round(w * scale);
+                    h = Math.round(h * scale);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL('image/jpeg', quality || 0.82));
+                };
+                img.onerror = () => reject(new Error('Не удалось прочитать картинку'));
+                img.src = reader.result;
+            };
+            reader.onerror = () => reject(new Error('Ошибка чтения файла'));
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function openPublishModal() {
+        if (!currentProjectId) {
+            alert('Сначала сохрани проект');
+            return;
+        }
+        document.getElementById('publishErr').textContent = '';
+        document.getElementById('publishModal').classList.add('open');
+    }
+
+    function closePublishModal() {
+        document.getElementById('publishModal').classList.remove('open');
+    }
+
+    async function publishProject() {
+        openPublishModal();
+    }
+
+    async function confirmPublish() {
+        if (!currentProjectId || !token) return;
+        const description = (document.getElementById('pubDescription').value || '').trim();
+        const errEl = document.getElementById('publishErr');
+        errEl.textContent = '';
+        if (description.length < 10) {
+            errEl.textContent = 'Описание минимум 10 символов';
+            return;
+        }
+        if (!pubCoverData) {
+            errEl.textContent = 'Добавь обложку';
+            return;
+        }
+        if (!pubPhotoData) {
+            errEl.textContent = 'Добавь фото';
+            return;
+        }
+        try {
+            document.getElementById('saveStatus').textContent = 'Публикация...';
+            document.getElementById('pubConfirm').disabled = true;
+            const res = await fetch(`${API_URL}/api/projects/${currentProjectId}/publish`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    description,
+                    cover: pubCoverData,
+                    photo: pubPhotoData
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                currentProjectPublished = true;
+                currentPlayUrl = data.url || null;
+                updatePublishButtons();
+                document.getElementById('saveStatus').textContent = data.url ? ('Опубликовано: ' + data.url) : 'Опубликовано!';
+                closePublishModal();
+                loadProjects();
+            } else {
+                errEl.textContent = data.error || 'Ошибка публикации';
+                document.getElementById('saveStatus').textContent = 'Ошибка';
+            }
+        } catch (e) {
+            errEl.textContent = 'Ошибка сети';
+            document.getElementById('saveStatus').textContent = 'Ошибка';
+        }
+        document.getElementById('pubConfirm').disabled = false;
+        setTimeout(() => document.getElementById('saveStatus').textContent = '', 3000);
+    }
+
+    document.getElementById('pubCancel').addEventListener('click', closePublishModal);
+    document.getElementById('pubConfirm').addEventListener('click', confirmPublish);
+    document.getElementById('publishModal').addEventListener('click', (e) => {
+        if (e.target.id === 'publishModal') closePublishModal();
+    });
+    document.getElementById('coverInput').addEventListener('change', async (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        try {
+            pubCoverData = await resizeImageFile(f, 640, 360, 0.85);
+            const img = document.getElementById('coverPreview');
+            img.src = pubCoverData;
+            document.getElementById('coverBox').classList.add('has');
+        } catch (err) {
+            alert(err.message || 'Ошибка');
+        }
+    });
+    document.getElementById('photoInput').addEventListener('change', async (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        try {
+            pubPhotoData = await resizeImageFile(f, 960, 540, 0.85);
+            const img = document.getElementById('photoPreview');
+            img.src = pubPhotoData;
+            document.getElementById('photoBox').classList.add('has');
+        } catch (err) {
+            alert(err.message || 'Ошибка');
+        }
+    });
+
+    async function unpublishProject() {
+        if (!currentProjectId || !token) return;
+        try {
+            document.getElementById('saveStatus').textContent = 'Снятие...';
+            const res = await fetch(`${API_URL}/api/projects/${currentProjectId}/unpublish`, { method: 'POST', headers: {'Authorization': 'Bearer ' + token} });
+            const data = await res.json();
+            if (data.success) {
+                currentProjectPublished = false;
+                currentPlayUrl = null;
+                updatePublishButtons();
+                document.getElementById('saveStatus').textContent = 'Снято';
+                loadProjects();
+            }
+        } catch(e) { document.getElementById('saveStatus').textContent = 'Ошибка'; }
+        setTimeout(() => document.getElementById('saveStatus').textContent = '', 2000);
+    }
+
+    function loadProject(id, name, blocksData, published, worldSettings, playUrl) {
+        currentProjectId = id; currentProjectName = name; currentProjectPublished = !!published;
+        currentPlayUrl = playUrl || null;
+        clearAll();
+        if (worldSettings && worldSettings.time) {
+            setTimeOfDay(worldSettings.time);
+            document.querySelectorAll('.time-btn').forEach(b => b.classList.toggle('active', b.dataset.time === worldSettings.time));
+        }
+        if (blocksData && blocksData.length) {
+            blocksData.forEach(b => createBlock(b.x, b.y, b.z, b.color, b.material || 'standard'));
+        }
+        if (worldSettings && worldSettings.lights) {
+            worldSettings.lights.forEach(l => createLight(l.x, l.y, l.z, '#' + l.color));
+        }
+        updatePublishButtons();
+        loadProjects();
+    }
+
+    document.getElementById('btnSave').addEventListener('click', saveProject);
+    document.getElementById('btnPublish').addEventListener('click', publishProject);
+    document.getElementById('btnUnpublish').addEventListener('click', unpublishProject);
+    document.getElementById('btnGamePasses').addEventListener('click', openGamePassesModal);
+
+    // ==================== ГЕЙМПАСЫ ====================
+    async function openGamePassesModal() {
+        if (!currentProjectId || !token) {
+            alert('Сначала сохрани проект');
+            return;
+        }
+        document.getElementById('gpErr').textContent = '';
+        document.getElementById('gpName').value = '';
+        document.getElementById('gpDesc').value = '';
+        document.getElementById('gpPrice').value = '50';
+        document.getElementById('gpModal').classList.add('open');
+        await refreshGamePassesList();
+    }
+    function closeGamePassesModal() {
+        document.getElementById('gpModal').classList.remove('open');
+    }
+    async function refreshGamePassesList() {
+        const list = document.getElementById('gpList');
+        list.innerHTML = '<div class="gp-empty">Загрузка...</div>';
+        try {
+            const res = await fetch(`${API_URL}/api/projects/${currentProjectId}/gamepasses`, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            const data = await res.json();
+            const passes = (data.success && data.gamepasses) ? data.gamepasses : [];
+            if (!passes.length) {
+                list.innerHTML = '<div class="gp-empty">Пока нет геймпасов. Создай первый ниже.</div>';
+                return;
+            }
+            list.innerHTML = passes.map(gp => `
+                <div class="gp-item" data-id="${gp.id}">
+                    <div class="gp-info">
+                        <div class="gp-name">${(gp.name || '').replace(/</g,'&lt;')}</div>
+                        <div class="gp-desc">${(gp.description || 'Без описания').replace(/</g,'&lt;')}</div>
+                    </div>
+                    <div class="gp-price">🪙 ${gp.price}</div>
+                    <button class="gp-del" type="button" onclick="deleteGamePass('${gp.id}')">Удалить</button>
+                </div>
+            `).join('');
+        } catch (e) {
+            list.innerHTML = '<div class="gp-empty" style="color:#ff4757;">Ошибка загрузки</div>';
+        }
+    }
+    async function addGamePass() {
+        const name = (document.getElementById('gpName').value || '').trim();
+        const description = (document.getElementById('gpDesc').value || '').trim();
+        const price = parseInt(document.getElementById('gpPrice').value, 10) || 0;
+        const errEl = document.getElementById('gpErr');
+        errEl.textContent = '';
+        if (name.length < 2) {
+            errEl.textContent = 'Название минимум 2 символа';
+            return;
+        }
+        try {
+            const res = await fetch(`${API_URL}/api/projects/${currentProjectId}/gamepasses`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, description, price })
+            });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('gpName').value = '';
+                document.getElementById('gpDesc').value = '';
+                document.getElementById('gpPrice').value = '50';
+                await refreshGamePassesList();
+            } else {
+                errEl.textContent = data.error || 'Ошибка';
+            }
+        } catch (e) {
+            errEl.textContent = 'Ошибка сети';
+        }
+    }
+    async function deleteGamePass(passId) {
+        if (!confirm('Удалить этот геймпас?')) return;
+        try {
+            const res = await fetch(`${API_URL}/api/projects/${currentProjectId}/gamepasses/${passId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            const data = await res.json();
+            if (data.success) await refreshGamePassesList();
+            else alert(data.error || 'Ошибка');
+        } catch (e) {
+            alert('Ошибка сети');
+        }
+    }
+    window.deleteGamePass = deleteGamePass;
+
+    document.getElementById('btnNewProject').addEventListener('click', async () => {
+        const name = document.getElementById('newProjectName').value.trim();
+        if (!name) {
+            alert('Введи название проекта в поле выше, затем нажми «+ Новый проект».');
+            document.getElementById('newProjectName').focus();
+            return;
+        }
+        currentProjectId = null;
+        currentProjectName = name;
+        currentProjectPublished = false;
+        clearAll();
+        setTimeOfDay('day');
+        updatePublishButtons();
+        document.getElementById('newProjectName').value = '';
+        await saveProject();
+    });
+
+    // Enter в поле названия = создать проект
+    document.getElementById('newProjectName').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('btnNewProject').click();
+        }
+    });
+
+    function openPlay() {
+        // Игра только через клиент Strovo
+        const url = currentProjectId
+            ? `launch.html?id=${encodeURIComponent(currentProjectId)}`
+            : 'download.html';
+        window.open(url, '_blank');
+    }
+
+    document.getElementById('btnPlay').addEventListener('click', async () => {
+        if (currentProjectId && currentProjectPublished) {
+            openPlay();
+            return;
+        }
+        if (!currentProjectId) {
+            const ok = await saveProject();
+            if (!ok || !currentProjectId) {
+                alert('Сначала сохрани проект (кнопка «💾 Сохранить»).');
+                return;
+            }
+        }
+        if (!currentProjectPublished) {
+            const doPub = confirm('Проект сохранён, но не опубликован.\nОпубликовать и запустить?');
+            if (doPub) {
+                await publishProject();
+                if (currentProjectPublished) openPlay();
+            }
+            return;
+        }
+        openPlay();
+    });
+
+    // ==================== ANIMATION ====================
+    function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        cloudGroup.children.forEach((c, i) => { c.position.x += 0.01 * (i % 2 === 0 ? 1 : -1); });
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+
+    // ==================== LOAD FROM URL (?edit=project_id) ====================
+    const urlParams = new URLSearchParams(window.location.search);
+    const editProjectId = urlParams.get('edit');
+    if (editProjectId && token) {
+        (async () => {
+            try {
+                document.getElementById('saveStatus').textContent = 'Загрузка проекта...';
+                const res = await fetch(`${API_URL}/api/projects/${editProjectId}`, { headers: {'Authorization': 'Bearer ' + token} });
+                const data = await res.json();
+                if (data.success) {
+                    const p = data.project;
+                    loadProject(p.id, p.name, p.blocks, p.published, p.world_settings, p.url);
+                    document.getElementById('saveStatus').textContent = 'Проект загружен!';
+                    setTimeout(() => document.getElementById('saveStatus').textContent = '', 2000);
+                } else {
+                    document.getElementById('saveStatus').textContent = 'Проект не найден';
+                }
+            } catch(e) {
+                document.getElementById('saveStatus').textContent = 'Ошибка загрузки';
+            }
+        })();
+    } else {
+        updatePublishButtons();
+    }
+    </script>
+
+    <div class="publish-modal-overlay" id="publishModal">
+        <div class="publish-modal">
+            <h2>🚀 Публикация игры</h2>
+            <p class="hint">Перед публикацией укажи описание, обложку и фото. Это увидят игроки в каталоге.</p>
+
+            <label for="pubDescription">Описание *</label>
+            <textarea id="pubDescription" rows="4" maxlength="1000" placeholder="О чём твоя игра? Минимум 10 символов..."></textarea>
+
+            <div class="img-row">
+                <div class="img-box" id="coverBox" onclick="document.getElementById('coverInput').click()">
+                    <img id="coverPreview" alt="Обложка">
+                    <div class="placeholder">🖼️</div>
+                    <div><strong>Обложка *</strong></div>
+                    <small>Для каталога игр</small>
+                    <input type="file" id="coverInput" accept="image/*" style="display:none">
+                </div>
+                <div class="img-box" id="photoBox" onclick="document.getElementById('photoInput').click()">
+                    <img id="photoPreview" alt="Фото">
+                    <div class="placeholder">📷</div>
+                    <div><strong>Фото *</strong></div>
+                    <small>Скриншот геймплея</small>
+                    <input type="file" id="photoInput" accept="image/*" style="display:none">
+                </div>
+            </div>
+
+            <div class="err" id="publishErr"></div>
+            <div class="actions">
+                <button type="button" class="btn-cancel" id="pubCancel">Отмена</button>
+                <button type="button" class="btn-go" id="pubConfirm">Опубликовать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Панель геймпасов (настройки игры) -->
+    <div class="gp-modal-overlay" id="gpModal">
+        <div class="gp-modal">
+            <h2>🎫 Геймпасы</h2>
+            <p class="hint">Платные пропуски для твоей игры. Игроки покупают их за коины в магазине на странице игры. Тебе приходит 90% от цены.</p>
+
+            <div class="gp-list" id="gpList">
+                <div class="gp-empty">Загрузка...</div>
+            </div>
+
+            <div class="gp-form">
+                <label>Название</label>
+                <input type="text" id="gpName" maxlength="60" placeholder="VIP, Двойной XP, Скин...">
+                <label>Описание</label>
+                <textarea id="gpDesc" rows="2" maxlength="300" placeholder="Что даёт этот геймпас?"></textarea>
+                <div class="row">
+                    <div>
+                        <label>Цена (коины)</label>
+                        <input type="number" id="gpPrice" min="0" max="1000000" value="50">
+                    </div>
+                </div>
+            </div>
+            <div class="gp-err" id="gpErr"></div>
+            <div class="gp-actions">
+                <button type="button" class="btn-cancel" onclick="closeGamePassesModal()">Закрыть</button>
+                <button type="button" class="btn-add" onclick="addGamePass()">+ Добавить</button>
+            </div>
+        </div>
+    </div>
+    <script>
+    document.getElementById('gpModal').addEventListener('click', (e) => {
+        if (e.target.id === 'gpModal') closeGamePassesModal();
+    });
+    </script>
+
+</body>
+</html>

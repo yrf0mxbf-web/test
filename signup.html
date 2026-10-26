@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация — Strovo</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-logo">
+                <a href="index.html" class="logo">
+                    <div class="logo-icon">S</div>
+                    <span class="logo-text">strovo</span>
+                </a>
+            </div>
+            <h1 class="auth-title">Создать аккаунт</h1>
+            <p class="auth-subtitle">Присоединяйся к миллионам игроков на Strovo!</p>
+            
+            <form id="signupForm">
+                <div class="form-group">
+                    <label class="form-label">Дата рождения</label>
+                    <div class="form-row">
+                        <select class="form-select" id="day" required>
+                            <option value="">День</option>
+                            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                            <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+                            <option>11</option><option>12</option><option>13</option><option>14</option><option>15</option>
+                            <option>16</option><option>17</option><option>18</option><option>19</option><option>20</option>
+                            <option>21</option><option>22</option><option>23</option><option>24</option><option>25</option>
+                            <option>26</option><option>27</option><option>28</option><option>29</option><option>30</option><option>31</option>
+                        </select>
+                        <select class="form-select" id="month" required>
+                            <option value="">Месяц</option>
+                            <option value="1">Январь</option><option value="2">Февраль</option><option value="3">Март</option>
+                            <option value="4">Апрель</option><option value="5">Май</option><option value="6">Июнь</option>
+                            <option value="7">Июль</option><option value="8">Август</option><option value="9">Сентябрь</option>
+                            <option value="10">Октябрь</option><option value="11">Ноябрь</option><option value="12">Декабрь</option>
+                        </select>
+                        <select class="form-select" id="year" required>
+                            <option value="">Год</option>
+                            <option>2020</option><option>2019</option><option>2018</option><option>2017</option><option>2016</option>
+                            <option>2015</option><option>2014</option><option>2013</option><option>2012</option><option>2011</option>
+                            <option>2010</option><option>2009</option><option>2008</option><option>2007</option><option>2006</option>
+                            <option>2005</option><option>2004</option><option>2003</option><option>2002</option><option>2001</option>
+                            <option>2000</option><option>1999</option><option>1998</option><option>1997</option><option>1996</option>
+                            <option>1995</option><option>1994</option><option>1993</option><option>1992</option><option>1991</option><option>1990</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Имя пользователя</label>
+                    <input type="text" class="form-input" id="username" placeholder="Придумай имя пользователя" required minlength="3" maxlength="20">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Пароль</label>
+                    <input type="password" class="form-input" id="password" placeholder="Придумай пароль" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Пол (необязательно)</label>
+                    <div class="gender-options">
+                        <div class="gender-option" data-value="male">Мужской</div>
+                        <div class="gender-option" data-value="female">Женский</div>
+                    </div>
+                </div>
+                <div id="errorMsg" class="error-message" style="display:none; color:#ff4757; font-size:13px; margin-bottom:12px;"></div>
+                <button type="submit" class="btn btn-primary btn-full" id="submitBtn">Зарегистрироваться</button>
+            </form>
+            
+            <p class="terms-text">
+                Нажимая «Зарегистрироваться», ты соглашаешься с <a href="#">Условиями использования</a> и <a href="#">Политикой конфиденциальности</a>.
+            </p>
+            
+            <p class="auth-footer">
+                Уже есть аккаунт? <a href="login.html">Войти</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+    const API_URL = window.location.origin;
+
+    // Gender selection
+    document.querySelectorAll('.gender-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+            document.querySelectorAll('.gender-option').forEach(o => o.classList.remove('active'));
+            opt.classList.add('active');
+        });
+    });
+
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const err = document.getElementById('errorMsg');
+        btn.disabled = true;
+        btn.textContent = 'Регистрация...';
+        err.style.display = 'none';
+
+        const day = document.getElementById('day').value;
+        const month = document.getElementById('month').value;
+        const year = document.getElementById('year').value;
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const genderEl = document.querySelector('.gender-option.active');
+        const gender = genderEl ? genderEl.dataset.value : '';
+
+        if (!day || !month || !year) {
+            err.textContent = 'Выбери дату рождения';
+            err.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Зарегистрироваться';
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/api/register`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    username,
+                    password,
+                    birth_date: `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`,
+                    gender
+                })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                localStorage.setItem('strovo_token', data.token);
+                localStorage.setItem('strovo_user', JSON.stringify(data.user));
+                window.location.href = 'index.html';
+            } else {
+                err.textContent = data.error || 'Ошибка регистрации';
+                err.style.display = 'block';
+            }
+        } catch (e) {
+            err.textContent = 'Сервер недоступен. Запусти: python server.py';
+            err.style.display = 'block';
+        }
+
+        btn.disabled = false;
+        btn.textContent = 'Зарегистрироваться';
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+[
+  {
+    "ts": "2026-09-08T15:14:28.777128",
+    "actor": "admin",
+    "action": "login",
+    "details": "Вход в панель (IP: 127.0.0.1)"
+  },
+  {
+    "ts": "2026-09-08T18:25:39",
+    "action": "login",
+    "detail": "Успешный вход в админку"
+  },
+  {
+    "ts": "2026-09-08T18:31:13",
+    "action": "login",
+    "detail": "Успешный вход в админку"
+  },
+  {
+    "ts": "2026-09-08T18:32:57",
+    "action": "login",
+    "detail": "Успешный вход в админку"
+  },
+  {
+    "ts": "2026-09-08T18:33:02",
+    "action": "delete_account",
+    "detail": "Удалён аккаунт laioq624"
+  },
+  {
+    "ts": "2026-09-08T22:28:37",
+    "action": "login_fail",
+    "detail": "Неверный пароль"
+  },
+  {
+    "ts": "2026-09-08T22:28:39",
+    "action": "login_fail",
+    "detail": "Неверный пароль"
+  },
+  {
+    "ts": "2026-09-08T22:28:40",
+    "action": "login_fail",
+    "detail": "Неверный пароль"
+  },
+  {
+    "ts": "2026-09-08T22:28:43",
+    "action": "login_fail",
+    "detail": "Неверный пароль"
+  },
+  {
+    "ts": "2026-09-08T22:28:45",
+    "action": "login_fail",
+    "detail": "Неверный пароль"
+  },
+  {
+    "ts": "2026-09-08T22:29:03",
+    "action": "login_fail",
+    "detail": "Неверный пароль"
+  },
+  {
+    "ts": "2026-09-08T22:38:00",
+    "action": "setup",
+    "detail": "Регистрация админки, модель zxer-pont-90880"
+  },
+  {
+    "ts": "2026-09-08T22:38:03",
+    "action": "login",
+    "detail": "Успешный вход в админку"
+  },
+  {
+    "ts": "2026-09-09T18:16:07",
+    "action": "login",
+    "detail": "Успешный вход в админку"
+  },
+  {
+    "ts": "2026-09-10T13:25:05",
+    "action": "login",
+    "detail": "Успешный вход в админку"
+  },
+  {
+    "ts": "2026-09-10T13:25:12",
+    "action": "delete_account",
+    "detail": "Удалён аккаунт vfcbcv"
+  },
+  {
+    "ts": "2026-09-10T13:25:19",
+    "action": "delete_game",
+    "detail": "4e328bb3-3ad9-4e89-a86f-328c7388f2f9 (Новый проект)"
+  },
+  {
+    "ts": "2026-09-10T13:47:58",
+    "action": "toggle_admin",
+    "detail": "admin → True"
+  },
+  {
+    "ts": "2026-09-10T13:48:01",
+    "action": "toggle_verified",
+    "detail": "admin → True"
+  },
+  {
+    "ts": "2026-09-10T13:49:44",
+    "action": "login",
+    "detail": "Успешный вход в админку"
+  },
+  {
+    "ts": "2026-09-10T13:54:37",
+    "action": "login",
+    "detail": "Успешный вход в админку"
+  },
+  {
+    "ts": "2026-09-30T20:45:07",
+    "action": "login",
+    "detail": "Успешный вход в админку"
+  },
+  {
+    "ts": "2026-09-30T20:45:17",
+    "action": "delete_account",
+    "detail": "Удалён аккаунт strovo"
+  },
+  {
+    "ts": "2026-09-30T20:45:40",
+    "action": "toggle_admin",
+    "detail": "strovo → True"
+  },
+  {
+    "ts": "2026-09-30T20:45:43",
+    "action": "toggle_verified",
+    "detail": "strovo → True"
+  },
+  {
+    "ts": "2026-09-30T20:45:56",
+    "action": "add_coins",
+    "detail": "strovo +90000 → 90500"
+  },
+  {
+    "ts": "2026-09-30T20:46:45",
+    "action": "delete_account",
+    "detail": "Удалён аккаунт admin"
+  },
+  {
+    "ts": "2026-09-30T20:46:48",
+    "action": "delete_account",
+    "detail": "Удалён аккаунт gfhgfj"
+  },
+  {
+    "ts": "2026-09-30T20:46:51",
+    "action": "delete_account",
+    "detail": "Удалён аккаунт laioq624"
+  },
+  {
+    "ts": "2026-10-04T17:31:11",
+    "action": "login",
+    "detail": "Успешный вход в админку"
+  },
+  {
+    "ts": "2026-10-04T17:31:18",
+    "action": "delete_account",
+    "detail": "Удалён аккаунт strovo"
+  },
+  {
+    "ts": "2026-10-04T17:32:04",
+    "action": "toggle_verified",
+    "detail": "Strovo → True"
+  },
+  {
+    "ts": "2026-10-04T17:32:05",
+    "action": "toggle_admin",
+    "detail": "Strovo → True"
+  },
+  {
+    "ts": "2026-10-04T17:32:10",
+    "action": "add_coins",
+    "detail": "Strovo +88888888889 → 88888888889"
+  },
+  {
+    "ts": "2026-10-21T21:37:05",
+    "action": "login_fail",
+    "detail": "Неверный пароль"
+  },
+  {
+    "ts": "2026-10-21T21:37:39",
+    "action": "login",
+    "detail": "Успешный вход в админку"
+  },
+  {
+    "ts": "2026-10-21T21:37:45",
+    "action": "delete_account",
+    "detail": "Удалён аккаунт Strovo"
+  },
+  {
+    "ts": "2026-10-21T21:38:38",
+    "action": "toggle_admin",
+    "detail": "Strovo → True"
+  },
+  {
+    "ts": "2026-10-21T21:38:40",
+    "action": "toggle_verified",
+    "detail": "Strovo → True"
+  },
+  {
+    "ts": "2026-10-21T21:38:45",
+    "action": "add_coins",
+    "detail": "Strovo +9999999999 → 9999999999"
+  }
+]

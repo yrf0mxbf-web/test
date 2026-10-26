@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Запуск игры — Strovo</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <style>
+        .launch-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            background: radial-gradient(ellipse at 50% 30%, rgba(255,107,0,0.12) 0%, transparent 55%), var(--bg);
+        }
+        .launch-card {
+            max-width: 460px;
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px 28px;
+            text-align: center;
+        }
+        .launch-card h1 { font-size: 22px; font-weight: 900; margin: 0 0 10px; }
+        .launch-card p { color: var(--text-muted); font-size: 14px; line-height: 1.55; margin: 0 0 18px; }
+        .launch-spinner {
+            width: 40px; height: 40px; margin: 0 auto 18px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .launch-btn {
+            display: block; width: 100%; box-sizing: border-box;
+            padding: 14px 18px; border-radius: 12px; font-weight: 800; font-size: 15px;
+            text-decoration: none; margin-bottom: 10px; border: none; cursor: pointer;
+            font-family: inherit;
+        }
+        .launch-btn.primary { background: #00a2ff; color: #fff; }
+        .launch-btn.primary:hover { background: #0088d6; }
+        .launch-btn.success { background: #00d26a; color: #fff; }
+        .launch-btn.success:hover { filter: brightness(1.05); }
+        .launch-btn.secondary {
+            background: transparent; color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .launch-btn.secondary:hover { border-color: var(--primary); }
+        .launch-note {
+            margin-top: 16px; font-size: 12px; color: var(--text-muted); line-height: 1.5;
+            text-align: left;
+        }
+        .launch-note code {
+            background: var(--bg-light); padding: 1px 5px; border-radius: 4px; font-size: 11px;
+        }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="launch-page">
+        <div class="launch-card">
+            <div class="launch-spinner" id="spinner"></div>
+            <h1 id="title">Запуск Strovo Client…</h1>
+            <p id="desc">Проверяем окружение…</p>
+
+            <button type="button" class="launch-btn success hidden" id="btnPlayHere">▶ Играть (я уже в клиенте)</button>
+            <a class="launch-btn primary" id="btnOpen" href="#">Открыть в Strovo Client</a>
+            <a class="launch-btn secondary" href="download.html">Скачать клиент</a>
+            <a class="launch-btn secondary" href="games.html">К списку игр</a>
+
+            <p class="launch-note" id="helpNote">
+                Если ты <strong>уже внутри Strovo Client</strong> — нажми зелёную кнопку «Играть».<br><br>
+                Если клиент не установлен — скачай установщик на странице «Скачать клиент».<br><br>
+                Логи: <code>C:\strovo-log</code>
+            </p>
+        </div>
+    </div>
+    <script>
+    (function () {
+        const params = new URLSearchParams(location.search);
+        const gameId = params.get('id') || '';
+        const code = params.get('code') || '';
+
+        function markAsClient() {
+            try { localStorage.setItem('strovo_is_client', '1'); } catch (_) {}
+            try { document.cookie = 'strovo_client=1; path=/; max-age=31536000'; } catch (_) {}
+        }
+
+        function isInsideClient() {
+            if (params.get('client') === '1') return true;
+            if (window.strovoDesktop === true) return true;
+            try { if (localStorage.getItem('strovo_is_client') === '1') return true; } catch (_) {}
+            try { if (document.cookie.indexOf('strovo_client=1') !== -1) return true; } catch (_) {}
+            const ua = navigator.userAgent || '';
+            if (/StrovoClient/i.test(ua)) return true;
+            if (/Electron/i.test(ua)) return true;
+            // WebView2
+            if (window.chrome && window.chrome.webview) return true;
+            // Часто у встроенного браузера нет полного chrome.runtime и т.п. — слабый сигнал
+            if (window.external && typeof window.external.invoke === 'function') return true;
+            return false;
+        }
+
+        function playUrl() {
+            if (gameId) return 'play.html?id=' + encodeURIComponent(gameId) + '&client=1';
+            if (code) return 'play.html?code=' + encodeURIComponent(code) + '&client=1';
+            return 'games.html';
+        }
+
+        function goPlayInClient() {
+            markAsClient();
+            window.location.replace(playUrl());
+        }
+
+        // Уже в клиенте → сразу в игру
+        if (isInsideClient()) {
+            document.getElementById('title').textContent = 'Клиент обнаружен';
+            document.getElementById('desc').textContent = 'Запускаем игру…';
+            setTimeout(goPlayInClient, 200);
+            return;
+        }
+
+        // Показать зелёную кнопку всегда — если человек в клиенте, а мы не распознали
+        const btnPlayHere = document.getElementById('btnPlayHere');
+        btnPlayHere.classList.remove('hidden');
+        btnPlayHere.addEventListener('click', goPlayInClient);
+
+        let protocolUrl = 'strovo://play';
+        if (gameId) protocolUrl = 'strovo://play?id=' + encodeURIComponent(gameId);
+        else if (code) protocolUrl = 'strovo://play?code=' + encodeURIComponent(code);
+
+        const btnOpen = document.getElementById('btnOpen');
+        btnOpen.href = protocolUrl;
+
+        function tryLaunch() {
+            try {
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = protocolUrl;
+                document.body.appendChild(iframe);
+                setTimeout(() => { try { iframe.remove(); } catch (_) {} }, 2500);
+            } catch (_) {}
+            try {
+                const a = document.createElement('a');
+                a.href = protocolUrl;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } catch (_) {}
+        }
+
+        setTimeout(tryLaunch, 400);
+
+        btnOpen.addEventListener('click', function (e) {
+            e.preventDefault();
+            tryLaunch();
+        });
+
+        setTimeout(function () {
+            document.getElementById('title').textContent = 'Клиент не открылся?';
+            document.getElementById('desc').textContent =
+                'Если окно Strovo уже открыто — нажми зелёную кнопку «Играть». Иначе скачай и установи клиент.';
+            document.getElementById('spinner').classList.add('hidden');
+        }, 1800);
+    })();
+    </script>
+</body>
+</html>
